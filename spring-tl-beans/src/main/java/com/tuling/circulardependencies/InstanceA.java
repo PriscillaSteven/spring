@@ -1,13 +1,16 @@
 package com.tuling.circulardependencies;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  * Created by smlz on 2019/5/29.
  */
-//@Component
+@Component
 public class InstanceA {
 
-
+	@Autowired
     private InstanceB instanceB;
 
     public InstanceB getInstanceB() {
@@ -18,7 +21,7 @@ public class InstanceA {
         this.instanceB = instanceB;
     }
 
-
+	//@Autowired
     public InstanceA(InstanceB instanceB) {
         this.instanceB = instanceB;
     }

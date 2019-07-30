@@ -26,47 +26,60 @@ import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.lang.Nullable;
 
 /**
- * Extension of the {@link org.springframework.beans.factory.BeanFactory}
- * interface to be implemented by bean factories that are capable of
- * autowiring, provided that they want to expose this functionality for
- * existing bean instances.
  *
- * <p>This subinterface of BeanFactory is not meant to be used in normal
- * application code: stick to {@link org.springframework.beans.factory.BeanFactory}
- * or {@link org.springframework.beans.factory.ListableBeanFactory} for
- * typical use cases.
- *
- * <p>Integration code for other frameworks can leverage this interface to
- * wire and populate existing bean instances that Spring does not control
- * the lifecycle of. This is particularly useful for WebWork Actions and
- * Tapestry Page objects, for example.
- *
- * <p>Note that this interface is not implemented by
- * {@link org.springframework.context.ApplicationContext} facades,
- * as it is hardly ever used by application code. That said, it is available
- * from an application context too, accessible through ApplicationContext's
- * {@link org.springframework.context.ApplicationContext#getAutowireCapableBeanFactory()}
- * method.
- *
- * <p>You may also implement the {@link org.springframework.beans.factory.BeanFactoryAware}
- * interface, which exposes the internal BeanFactory even when running in an
- * ApplicationContext, to get access to an AutowireCapableBeanFactory:
- * simply cast the passed-in BeanFactory to AutowireCapableBeanFactory.
- *
- * @author Juergen Hoeller
- * @since 04.12.2003
- * @see org.springframework.beans.factory.BeanFactoryAware
- * @see org.springframework.beans.factory.config.ConfigurableListableBeanFactory
- * @see org.springframework.context.ApplicationContext#getAutowireCapableBeanFactory()
  */
 public interface AutowireCapableBeanFactory extends BeanFactory {
 
 	/**
 	 no 不使用自动装配。必须通过ref元素指定依赖，这是默认设置。由于显式指定协作者可以使配置更灵活、
 	 更清晰，因此对于较大的部署配置，推荐采用该设置。
-	 * @see #createBean
-	 * @see #autowire
-	 * @see #autowireBeanProperties
+		 public class People {
+			private Book book;
+		 }
+
+
+	     @Component
+		 public class Book {
+			 private String name;
+		 }
+
+		 测试1:
+		 public static void main(String[] args) {
+			  ApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
+			  People people = (People) context.getBean(People.class);
+			  AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
+			  People people = (People) beanFactory.autowire(People.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+			  System.out.println(people.getBook());
+		 }
+	     结论:Book(name=null) 即使在People里面并没有@Autowired Book
+		 ====测试二
+		 public static void main(String[] args) {
+			 ApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
+			 People people = (People) context.getBean(People.class);
+			 AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
+			 People people = (People) beanFactory.autowire(People.class, AutowireCapableBeanFactory.AUTOWIRE_NO, false);
+			 System.out.println(people.getBook());
+		 }
+	     测试结果；null
+		 说明确实自动不会注入外部类
+
+	     ========测试三===========
+		 public class People {
+		    @AutoWired
+		 	private Book book;
+		 }
+
+		 public static void main(String[] args) {
+			 ApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
+			 People people = (People) context.getBean(People.class);
+			 AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
+			 People people = (People) beanFactory.autowire(People.class, AutowireCapableBeanFactory.AUTOWIRE_NO, false);
+			 System.out.println(people.getBook());
+		 }
+
+	 测试结果:最终的结果是
+	 Book(name=null)
+	 *
 	 */
 	int AUTOWIRE_NO = 0;
 
@@ -92,8 +105,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	int AUTOWIRE_CONSTRUCTOR = 3;
 
 	/**
-	 * Constant that indicates determining an appropriate autowire strategy
-	 * through introspection of the bean class.
+	 *表明通过Bean的class的内部来自动装配 Spring3.0被弃用。
 	 * @see #createBean
 	 * @see #autowire
 	 * @deprecated as of Spring 3.0: If you are using mixed autowiring strategies,
@@ -108,7 +120,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	//-------------------------------------------------------------------------
 
 	/**
-	 * Fully create a new bean instance of the given class.
+	 *根据class对象创建bean
 	 * <p>Performs full initialization of the bean, including all applicable
 	 * {@link BeanPostProcessor BeanPostProcessors}.
 	 * <p>Note: This is intended for creating a fresh instance, populating annotated

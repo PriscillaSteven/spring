@@ -40,6 +40,28 @@ import org.springframework.lang.Nullable;
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
  */
+
+/**
+ * 后置处理器接口,系统默认的有7个名称分别为:
+ * 1:ApplicationContextAwareProcessor 直接实现了 BeanPostProcessor
+ *   用来直接处理我们的组件是否实现了ApplicationContextAware接口的作用,往我们容器中注册回调ApplicationContext接口
+ *   起作用的接口:postProcessBeforeInitialization()方法来进行回调我们的aware接口的
+ *   执行时间：我们的Bean进行了调用了构造方法之后，初始化之前
+ * 2:CommonAnnotationBeanPostProcessor
+ *      extends      InitDestroyAnnotationBeanPostProcessor 用于处理@PostCust  @Predestory注解的
+ *      implements   InstantiationAwareBeanPostProcessor  实例化执行
+ * :用来处理JSR250规范的注解的。。。。。。。。。
+ *
+ * 3:AutowiredAnnotationBeanPostProcessor
+ *      extends：InstantiationAwareBeanPostProcessorAdapter
+ *      implement： MergedBeanDefinitionPostProcessor  用来解析bean之间的@AutoWired注解
+ *
+ * 4：RequiredAnnotationBeanPostProcessor  处理reqireud属性的
+ *      extends：InstantiationAwareBeanPostProcessorAdapter
+ *      implement： MergedBeanDefinitionPostProcessor  用来解析bean之间的@AutoWired注解
+ *
+ *
+ */
 public interface BeanPostProcessor {
 
 	/**

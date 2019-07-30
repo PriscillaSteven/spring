@@ -507,7 +507,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Return the list of statically specified ApplicationListeners.
+	 * Return the list of statically spdecified ApplicationListeners.
 	 */
 	public Collection<ApplicationListener<?>> getApplicationListeners() {
 		return this.applicationListeners;
