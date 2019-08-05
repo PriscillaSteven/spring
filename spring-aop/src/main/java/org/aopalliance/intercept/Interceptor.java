@@ -54,6 +54,14 @@ import org.aopalliance.aop.Advice;
  * @author Rod Johnson
  * @see Joinpoint
  */
+
+/**
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述 拦截器接口
+* @author: smlz
+* @createDate: 2019/7/30 15:56
+* @version: 1.0
+*/
 public interface Interceptor extends Advice {
 
 }

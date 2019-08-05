@@ -26,6 +26,13 @@ import org.aopalliance.aop.Advice;
  * @since 2.0.3
  * @see BeforeAdvice
  */
+/**
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:后置通知接口同样也是标记接口
+* @author: smlz
+* @createDate: 2019/7/30 15:54
+* @version: 1.0
+*/
 public interface AfterAdvice extends Advice {
 
 }

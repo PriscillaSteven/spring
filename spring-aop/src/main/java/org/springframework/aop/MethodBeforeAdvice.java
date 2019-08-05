@@ -29,6 +29,13 @@ import org.springframework.lang.Nullable;
  *
  * @author Rod Johnson
  */
+/**
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述,方法前置通知接口,提供一个方法用于来执行我们aop中切面的方法
+* @author: smlz
+* @createDate: 2019/7/30 15:49
+* @version: 1.0
+*/
 public interface MethodBeforeAdvice extends BeforeAdvice {
 
 	/**
@@ -40,6 +47,16 @@ public interface MethodBeforeAdvice extends BeforeAdvice {
 	 * Any exception thrown will be returned to the caller if it's
 	 * allowed by the method signature. Otherwise the exception
 	 * will be wrapped as a runtime exception.
+	 */
+	/**
+	 * 方法实现说明:执行我们的前置通知
+	 * @author:smlz
+	 * @param method 传入进来的方法对象
+	 * @param args:入参
+	 * @param target:目标对象
+	 * @return: void
+	 * @exception:
+	 * @date:2019/7/30 15:51
 	 */
 	void before(Method method, Object[] args, @Nullable Object target) throws Throwable;
 

@@ -36,19 +36,12 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.FrameworkServlet;
 
 /**
- * Base class for {@link org.springframework.web.WebApplicationInitializer}
- * implementations that register a {@link DispatcherServlet} in the servlet context.
- *
- * <p>Most applications should consider extending the Spring Java config subclass
- * {@link AbstractAnnotationConfigDispatcherServletInitializer}.
- *
- * @author Arjen Poutsma
- * @author Chris Beams
- * @author Rossen Stoyanchev
- * @author Juergen Hoeller
- * @author Stephane Nicoll
- * @since 3.2
- */
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:该初始化器会注册我们的前端控制器
+* @author: smlz
+* @createDate: 2019/7/31 21:12
+* @version: 1.0
+*/
 public abstract class AbstractDispatcherServletInitializer extends AbstractContextLoaderInitializer {
 
 	/**
@@ -57,40 +50,74 @@ public abstract class AbstractDispatcherServletInitializer extends AbstractConte
 	public static final String DEFAULT_SERVLET_NAME = "dispatcher";
 
 
+	/**
+	 * 方法实现说明:该方法做到了承上启下的作用.
+	 * super.onStartup(servletContext);会触发IOC 根容器的启动
+	 * registerDispatcherServlet(servletContext);会触发子容器的创建
+	 * @author:smlz
+	 * @param servletContext 我们web应用的上下文
+	 * @exception:ServletException
+	 * @date:2019/8/1 13:32
+	 */
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
+		//实例化我们的spring root上下文
 		super.onStartup(servletContext);
+		//注册我们的DispatcherServlet   创建我们spring web 上下文对象
 		registerDispatcherServlet(servletContext);
 	}
 
 	/**
-	 * Register a {@link DispatcherServlet} against the given servlet context.
-	 * <p>This method will create a {@code DispatcherServlet} with the name returned by
-	 * {@link #getServletName()}, initializing it with the application context returned
-	 * from {@link #createServletApplicationContext()}, and mapping it to the patterns
-	 * returned from {@link #getServletMappings()}.
-	 * <p>Further customization can be achieved by overriding {@link
-	 * #customizeRegistration(ServletRegistration.Dynamic)} or
-	 * {@link #createDispatcherServlet(WebApplicationContext)}.
-	 * @param servletContext the context to register the servlet against
+	 * 方法实现说明:注册我们的前端控制器对象
+	 *
+		 <servlet>
+		 	<servlet-name>app</servlet-name>
+		 	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		 <init-param>
+		 	<param-name>contextConfigLocation</param-name>
+		 	<param-value></param-value>
+		 </init-param>
+		 <load-on-startup>1</load-on-startup>
+		 </servlet>
+		 <servlet-mapping>
+		 	<servlet-name>app</servlet-name>
+		 	<url-pattern>/app/*</url-pattern>
+		 </servlet-mapping>
+	 * @author:smlz
+	 * @param servletContext 应用上下文对象
+	 * @return:
+	 * @exception:
+	 * @date:2019/7/31 21:34
 	 */
 	protected void registerDispatcherServlet(ServletContext servletContext) {
+		//获取我们的DispatcherServlet的名称
 		String servletName = getServletName();
 		Assert.hasLength(servletName, "getServletName() must not return null or empty");
 
+		//创建WebApplicationContext对象
 		WebApplicationContext servletAppContext = createServletApplicationContext();
 		Assert.notNull(servletAppContext, "createServletApplicationContext() must not return null");
 
+		/**
+		 * 创建我们的DispatcherServlet对象,所以tomcat会对DispatcherServlet进行生命周期管理
+		 */
 		FrameworkServlet dispatcherServlet = createDispatcherServlet(servletAppContext);
 		Assert.notNull(dispatcherServlet, "createDispatcherServlet(WebApplicationContext) must not return null");
+
+		/**
+		 * 获取我们的ServletApplicationContextInitializers对象，然后把ServletApplicationContextInitializers
+		 * 注册到我们的dispatcherServlet
+		 */
 		dispatcherServlet.setContextInitializers(getServletApplicationContextInitializers());
 
+		//注册我们的dispatcherServlet
 		ServletRegistration.Dynamic registration = servletContext.addServlet(servletName, dispatcherServlet);
 		if (registration == null) {
 			throw new IllegalStateException("Failed to register servlet with name '" + servletName + "'. " +
 					"Check if there is another servlet registered under the same name.");
 		}
 
+		//设置我们的dispatcherServlet的属性
 		registration.setLoadOnStartup(1);
 		registration.addMapping(getServletMappings());
 		registration.setAsyncSupported(isAsyncSupported());
@@ -110,17 +137,16 @@ public abstract class AbstractDispatcherServletInitializer extends AbstractConte
 	 * Defaults to {@link #DEFAULT_SERVLET_NAME}.
 	 * @see #registerDispatcherServlet(ServletContext)
 	 */
+
 	protected String getServletName() {
 		return DEFAULT_SERVLET_NAME;
 	}
 
 	/**
-	 * Create a servlet application context to be provided to the {@code DispatcherServlet}.
-	 * <p>The returned context is delegated to Spring's
-	 * {@link DispatcherServlet#DispatcherServlet(WebApplicationContext)}. As such,
-	 * it typically contains controllers, view resolvers, locale resolvers, and other
-	 * web-related beans.
-	 * @see #registerDispatcherServlet(ServletContext)
+	 * 方法实现说明:创建web应用上下文对象：但是本类的该方法是一个空的实现，交给
+	 * AbstractAnnotationConfigDispatcherServletInitializer子类去实现
+	 * @author:smlz
+	 * @date:2019/7/31 21:43
 	 */
 	protected abstract WebApplicationContext createServletApplicationContext();
 

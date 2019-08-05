@@ -139,7 +139,9 @@ public class ContextLoader {
 		// This is currently strictly internal and not meant to be customized
 		// by application developers.
 		try {
+			//读取ContextLoader.properties  org.springframework.web.context.support.XmlWebApplicationContext
 			ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, ContextLoader.class);
+			//把ContextLoader.properties的属性读取到一个properties对象中.
 			defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
 		}
 		catch (IOException ex) {
@@ -174,56 +176,31 @@ public class ContextLoader {
 
 
 	/**
-	 * Create a new {@code ContextLoader} that will create a web application context
-	 * based on the "contextClass" and "contextConfigLocation" servlet context-params.
-	 * See class-level documentation for details on default values for each.
-	 * <p>This constructor is typically used when declaring the {@code
-	 * ContextLoaderListener} subclass as a {@code <listener>} within {@code web.xml}, as
-	 * a no-arg constructor is required.
-	 * <p>The created application context will be registered into the ServletContext under
-	 * the attribute name {@link WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE}
-	 * and subclasses are free to call the {@link #closeWebApplicationContext} method on
-	 * container shutdown to close the application context.
-	 * @see #ContextLoader(WebApplicationContext)
-	 * @see #initWebApplicationContext(ServletContext)
-	 * @see #closeWebApplicationContext(ServletContext)
+	 * 方法实现说明:ContextLoader是我们ContextLoaderListner的父类,所以
+	      <listener>
+	 			<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	 		</listener>
+
+	 		<context-param>
+	 			<param-name>contextConfigLocation</param-name>
+	 			<param-value>/WEB-INF/root-context.xml</param-value>
+	        </context-param>
+	  会调用我们的ContextLoaderListener的无参数构造器对象.就会触发我们的ContextLoader()构造器
+	  然后触发我们本类的静态代码块.
+	 * @author:smlz
+	 * @date:2019/8/1 14:13
 	 */
 	public ContextLoader() {
 	}
 
 	/**
-	 * Create a new {@code ContextLoader} with the given application context. This
-	 * constructor is useful in Servlet 3.0+ environments where instance-based
-	 * registration of listeners is possible through the {@link ServletContext#addListener}
-	 * API.
-	 * <p>The context may or may not yet be {@linkplain
-	 * ConfigurableApplicationContext#refresh() refreshed}. If it (a) is an implementation
-	 * of {@link ConfigurableWebApplicationContext} and (b) has <strong>not</strong>
-	 * already been refreshed (the recommended approach), then the following will occur:
-	 * <ul>
-	 * <li>If the given context has not already been assigned an {@linkplain
-	 * ConfigurableApplicationContext#setId id}, one will be assigned to it</li>
-	 * <li>{@code ServletContext} and {@code ServletConfig} objects will be delegated to
-	 * the application context</li>
-	 * <li>{@link #customizeContext} will be called</li>
-	 * <li>Any {@link ApplicationContextInitializer}s specified through the
-	 * "contextInitializerClasses" init-param will be applied.</li>
-	 * <li>{@link ConfigurableApplicationContext#refresh refresh()} will be called</li>
-	 * </ul>
-	 * If the context has already been refreshed or does not implement
-	 * {@code ConfigurableWebApplicationContext}, none of the above will occur under the
-	 * assumption that the user has performed these actions (or not) per his or her
-	 * specific needs.
-	 * <p>See {@link org.springframework.web.WebApplicationInitializer} for usage examples.
-	 * <p>In any case, the given application context will be registered into the
-	 * ServletContext under the attribute name {@link
-	 * WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE} and subclasses are
-	 * free to call the {@link #closeWebApplicationContext} method on container shutdown
-	 * to close the application context.
-	 * @param context the application context to manage
-	 * @see #initWebApplicationContext(ServletContext)
-	 * @see #closeWebApplicationContext(ServletContext)
-	 */
+	* @vlog: 高于生活，源于生活
+	* @desc: 类的描述ContextLoader是我们ContextLoaderListner的父类,
+	 * 在创建注解版本的时候会触发该方法，然后context 是已经创建好了的
+	* @author: smlz
+	* @createDate: 2019/8/1 14:19
+	* @version: 1.0
+	*/
 	public ContextLoader(WebApplicationContext context) {
 		this.context = context;
 	}
@@ -247,15 +224,12 @@ public class ContextLoader {
 
 
 	/**
-	 * Initialize Spring's web application context for the given servlet context,
-	 * using the application context provided at construction time, or creating a new one
-	 * according to the "{@link #CONTEXT_CLASS_PARAM contextClass}" and
-	 * "{@link #CONFIG_LOCATION_PARAM contextConfigLocation}" context-params.
-	 * @param servletContext current servlet context
-	 * @return the new WebApplicationContext
-	 * @see #ContextLoader(WebApplicationContext)
-	 * @see #CONTEXT_CLASS_PARAM
-	 * @see #CONFIG_LOCATION_PARAM
+	 * 方法实现说明:初始化我们的跟容器的上下文对象,在子类contextInitialized()方法调用该方法
+	 * @author:smlz
+	 * @param servletContext
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/1 14:22
 	 */
 	public WebApplicationContext initWebApplicationContext(ServletContext servletContext) {
 		if (servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE) != null) {
@@ -272,25 +246,41 @@ public class ContextLoader {
 		long startTime = System.currentTimeMillis();
 
 		try {
-			// Store context in local instance variable, to guarantee that
-			// it is available on ServletContext shutdown.
+			/**
+			 * 在创建xml版本的时候context是空的 所以我们在这里需要在这里创建     根容器对象
+			 */
 			if (this.context == null) {
+				/**
+				 * 注意：由于xml版本中context为空，所以这个if逻辑是用来创建我们的 根容器对象
+				 */
 				this.context = createWebApplicationContext(servletContext);
 			}
+			/**
+			 * 不为空，很明显我们，这个是注解版本进来的，在外面就已经传递
+			 * 进来了context对象 AnnotationConfigWebApplicationContext,
+			 * 判断我们的AnnotationConfigWebApplicationContext是不是ConfigurableWebApplicationContext类型的
+			 */
 			if (this.context instanceof ConfigurableWebApplicationContext) {
+				//强制转化成ConfigurableWebApplicationContext
 				ConfigurableWebApplicationContext cwac = (ConfigurableWebApplicationContext) this.context;
-				if (!cwac.isActive()) {
-					// The context has not yet been refreshed -> provide services such as
-					// setting the parent context, setting the application context id, etc
+
+				//判断ConfigurableWebApplicationContext 配置上下文版本的是不是激活了
+				if (!cwac.isActive()) {//没有激活
+					//若此时ConfigurableWebApplicationContext对象的父容器为空
 					if (cwac.getParent() == null) {
-						// The context instance was injected without an explicit parent ->
-						// determine parent for root web application context, if any.
+						//为我们的Root Context加载我们的父容器
 						ApplicationContext parent = loadParentContext(servletContext);
 						cwac.setParent(parent);
 					}
+					//配置和刷新我们的根容器对象
 					configureAndRefreshWebApplicationContext(cwac, servletContext);
 				}
 			}
+			/**
+			 * 把我们的spring上下文保存到 应用上下文对象中
+			 * 方便我们在Spring web 上下文对象实例化过程会从servletContext取出来
+			 */
+
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.context);
 
 			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
@@ -378,21 +368,29 @@ public class ContextLoader {
 
 	protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac, ServletContext sc) {
 		if (ObjectUtils.identityToString(wac).equals(wac.getId())) {
-			// The application context id is still set to its original default value
-			// -> assign a more useful id based on available information
+			//去我们的ServletContext获取contextId
 			String idParam = sc.getInitParameter(CONTEXT_ID_PARAM);
+			//若我们的web.xml配置了该参数就设置到容器中
 			if (idParam != null) {
 				wac.setId(idParam);
 			}
-			else {
-				// Generate default id...
+			else {//若没有配置 就使用默认的
+
 				wac.setId(ConfigurableWebApplicationContext.APPLICATION_CONTEXT_ID_PREFIX +
 						ObjectUtils.getDisplayString(sc.getContextPath()));
 			}
 		}
 
+		//把我们的当前工程的应用问设置到spring 上下文中
 		wac.setServletContext(sc);
+		/**
+		 * 		<context-param>
+		 			<param-name>contextConfigLocation</param-name>
+		 			<param-value>/WEB-INF/app-context.xml</param-value>
+		 		</context-param>
+		 */
 		String configLocationParam = sc.getInitParameter(CONFIG_LOCATION_PARAM);
+		//把我们配置文件的路径保存到上下文中
 		if (configLocationParam != null) {
 			wac.setConfigLocation(configLocationParam);
 		}
@@ -405,7 +403,11 @@ public class ContextLoader {
 			((ConfigurableWebEnvironment) env).initPropertySources(sc, null);
 		}
 
+		//定制我们的spring上下文对象
 		customizeContext(sc, wac);
+		/**
+		 * 会触发IOC根容器 的刷新
+		 */
 		wac.refresh();
 	}
 

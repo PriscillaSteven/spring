@@ -29,6 +29,14 @@ import org.springframework.lang.Nullable;
  * @author Adrian Colyer
  * @since 2.0
  */
+/**
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述,是我们前置通知的直接实现类,用于描述我们的前置通知对象,真正调用的对象
+ *       本类使用的设计模式使我们的【适配器模式】
+* @author: smlz
+* @createDate: 2019/7/30 15:45
+* @version: 1.0
+*/
 @SuppressWarnings("serial")
 public class AspectJMethodBeforeAdvice extends AbstractAspectJAdvice implements MethodBeforeAdvice, Serializable {
 
@@ -38,7 +46,16 @@ public class AspectJMethodBeforeAdvice extends AbstractAspectJAdvice implements 
 		super(aspectJBeforeAdviceMethod, pointcut, aif);
 	}
 
-
+	/**
+	 * 方法实现说明:执行我们的前置通知
+	 * @author:smlz
+	 * @param method 传入进来的方法对象
+	 * @param args:入参
+	 * @param target:目标对象
+	 * @return: void
+	 * @exception:
+	 * @date:2019/7/30 15:51
+	 */
 	@Override
 	public void before(Method method, Object[] args, @Nullable Object target) throws Throwable {
 		invokeAdviceMethod(getJoinPointMatch(), null, null);

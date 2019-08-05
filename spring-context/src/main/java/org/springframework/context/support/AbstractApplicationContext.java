@@ -556,7 +556,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			catch (BeansException ex) {
 				if (logger.isWarnEnabled()) {
-					logger.warn("Exception encountered during context initialization - " +
+					logger.warn("Exception  encountered during context initialization - " +
 							"cancelling refresh attempt: " + ex);
 				}
 
@@ -640,7 +640,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
-		//刷新bean工厂()
+		/**
+		 * 普通的spring环境的时候，那么这这里bean工厂已经被创建，所以调用GenericApplicationContext#refreshBeanFactory()刷新工厂。
+		 * 而springmvc的环境的时候，bean工厂还没有创建 需要通过refreshBeanFactory();创建
+		 */
 		refreshBeanFactory();
 		//返回我们的bean工厂
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
@@ -1330,9 +1333,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Return the internal bean factory of the parent context if it implements
-	 * ConfigurableApplicationContext; else, return the parent context itself.
-	 * @see org.springframework.context.ConfigurableApplicationContext#getBeanFactory
+	 * 方法实现说明:获取我们spring上下文对象的父上下文，然后通过父上下文获取父工厂
+	 * Spring 根的上下文对象不会有父容器，但是我们的springmvc就在这里存在父工厂.
+	 * @author:smlz
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/2 20:41
 	 */
 	@Nullable
 	protected BeanFactory getInternalParentBeanFactory() {

@@ -26,17 +26,16 @@ import org.springframework.aop.AfterReturningAdvice;
 import org.springframework.util.Assert;
 
 /**
- * Interceptor to wrap an {@link org.springframework.aop.AfterReturningAdvice}.
- * Used internally by the AOP framework; application developers should not need
- * to use this class directly.
- *
- * @author Rod Johnson
- * @see MethodBeforeAdviceInterceptor
- * @see ThrowsAdviceInterceptor
- */
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:使用执行我们的返回通知的具体执行者:用的是装饰模式
+* @author: smlz
+* @createDate: 2019/7/30 16:19
+* @version: 1.0
+*/
 @SuppressWarnings("serial")
 public class AfterReturningAdviceInterceptor implements MethodInterceptor, AfterAdvice, Serializable {
 
+	//把我们的返回通知对象作为属性包裹
 	private final AfterReturningAdvice advice;
 
 

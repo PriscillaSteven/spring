@@ -12,8 +12,9 @@ public class MainClass {
         //创建IOC容器
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(MainConfig.class);
 
-        //ctx.getBean("person");
-        //System.out.println(ctx.getBean("person").toString());
-		ctx.close();
+
+        //System.out.println(ctx.getBean("instanceA").toString());
+		//System.out.println(ctx.getBean("instanceB").toString());
+
     }
 }

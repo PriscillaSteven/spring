@@ -16,13 +16,29 @@
 
 package org.aopalliance.aop;
 
+
+
 /**
- * Tag interface for Advice. Implementations can be any type
- * of advice, such as Interceptors.
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述 aop中所有切面的顶级接口
+* @author: smlz
+* @createDate: 2019/7/30 15:43
+* @version: 1.0
  *
- * @author Rod Johnson
- * @version $Id: Advice.java,v 1.1 2004/03/19 17:02:16 johnsonr Exp $
- */
+ * Advice
+ *   1>AfterAdvice
+ *     1.1>ThrowsAdvice
+ *   2>BeforeAdvice
+ *     2.1>MethodBeforeAdvice
+ *   3>Interceptor
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+*/
 public interface Advice {
 
 }

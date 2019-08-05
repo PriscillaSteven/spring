@@ -25,11 +25,13 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.AfterAdvice;
 
 /**
- * Spring AOP advice wrapping an AspectJ after advice method.
- *
- * @author Rod Johnson
- * @since 2.0
- */
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:我们的后置通知具体实现类对象 用于来执行我们的后置通知方法
+ *       本类的设计模式就是【适配器模式】
+* @author: smlz
+* @createDate: 2019/7/30 16:08
+* @version: 1.0
+*/
 @SuppressWarnings("serial")
 public class AspectJAfterAdvice extends AbstractAspectJAdvice
 		implements MethodInterceptor, AfterAdvice, Serializable {
@@ -41,6 +43,15 @@ public class AspectJAfterAdvice extends AbstractAspectJAdvice
 	}
 
 
+	/**
+	 * 方法实现说明
+	 * @author:smlz
+	 * @param mi:主要调用对象是ReflectiveMethodInvocation 会通过ReflectiveMethodInvocation.proceed()方法
+	 *          来执行我们的拦截器链
+	 * @return:
+	 * @exception:
+	 * @date:2019/7/30 16:06
+	 */
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		try {

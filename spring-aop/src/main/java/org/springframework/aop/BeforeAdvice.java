@@ -27,6 +27,14 @@ import org.aopalliance.aop.Advice;
  * @author Rod Johnson
  * @see AfterAdvice
  */
+/**
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:aop的二级接口,该接口是我们的标记接口,标识我们的通知是前置通知.
+ *       作用二: 用于扩展
+* @author: smlz
+* @createDate: 2019/7/30 15:43
+* @version: 1.0
+*/
 public interface BeforeAdvice extends Advice {
 
 }

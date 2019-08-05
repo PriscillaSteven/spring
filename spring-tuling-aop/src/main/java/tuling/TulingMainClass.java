@@ -1,7 +1,6 @@
 package tuling;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Created by smlz on 2019/6/10.
@@ -9,8 +8,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class TulingMainClass {
 
     public static void main(String[] args) {
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(MainConfig.class);
 
+    	AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(MainConfig.class);
         Calculate calculate = (Calculate) ctx.getBean("calculate");
 
         //int retVal = calculate.mod(2,4);

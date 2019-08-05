@@ -25,11 +25,13 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.AfterAdvice;
 
 /**
- * Spring AOP advice wrapping an AspectJ after-throwing advice method.
- *
- * @author Rod Johnson
- * @since 2.0
- */
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:异常通知具体执行对象,由于实现了 MethodInterceptor
+ *       所以执行 invoke来执行我们的目标对象
+* @author: smlz
+* @createDate: 2019/7/30 16:22
+* @version: 1.0
+*/
 @SuppressWarnings("serial")
 public class AspectJAfterThrowingAdvice extends AbstractAspectJAdvice
 		implements MethodInterceptor, AfterAdvice, Serializable {
@@ -56,6 +58,14 @@ public class AspectJAfterThrowingAdvice extends AbstractAspectJAdvice
 		setThrowingNameNoCheck(name);
 	}
 
+	/**
+	 * 方法实现说明:执行我们的异常通知
+	 * @author:smlz
+	 * @param mi  ReflectiveMethodInvocation
+	 * @return: Object
+	 * @exception: Throwable
+	 * @date:2019/7/30 16:23
+	 */
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		try {

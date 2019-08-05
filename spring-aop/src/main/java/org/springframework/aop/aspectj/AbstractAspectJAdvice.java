@@ -59,6 +59,14 @@ import org.springframework.util.StringUtils;
  * @author Ramnivas Laddad
  * @since 2.0
  */
+/**
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:我们Advice通知的抽象类,实现前置通知，通知，返回通知，异常通知，环绕通知等类的公共行为
+ *       本类应用的设计模式就是 模版方法
+* @author: smlz
+* @createDate: 2019/7/30 15:47
+* @version: 1.0
+*/
 @SuppressWarnings("serial")
 public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedenceInformation, Serializable {
 

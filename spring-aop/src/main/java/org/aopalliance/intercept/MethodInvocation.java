@@ -19,22 +19,20 @@ package org.aopalliance.intercept;
 import java.lang.reflect.Method;
 
 /**
- * Description of an invocation to a method, given to an interceptor
- * upon method-call.
- *
- * <p>A method invocation is a joinpoint and can be intercepted by a
- * method interceptor.
- *
- * @author Rod Johnson
- * @see MethodInterceptor
- */
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:方法调用对象接口  aop使用的实现类就是 ReflectiveMethodInvocation
+* @author: smlz
+* @createDate: 2019/7/30 16:01
+* @version: 1.0
+*/
 public interface MethodInvocation extends Invocation {
 
 	/**
-	 * Get the method being called.
-	 * <p>This method is a frienly implementation of the
-	 * {@link Joinpoint#getStaticPart()} method (same result).
-	 * @return the method being called
+	 * 方法实现说明
+	 * @author:smlz
+	 * @return:Method 当前的调用对象
+	 * @exception: Method
+	 * @date:2019/7/30 16:02
 	 */
 	Method getMethod();
 

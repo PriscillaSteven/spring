@@ -7,12 +7,10 @@ import org.springframework.stereotype.Component;
 /**
  * Created by smlz on 2019/5/29.
  */
-@Component
 public class InstanceB {
 
-	@Autowired
-    private InstanceA instanceA;
 
+    private InstanceA instanceA;
 
 
     public InstanceA getInstanceA() {
@@ -23,7 +21,6 @@ public class InstanceB {
     public void setInstanceA(InstanceA instanceA) {
         this.instanceA = instanceA;
     }
-
 
     public InstanceB(InstanceA instanceA) {
         this.instanceA = instanceA;

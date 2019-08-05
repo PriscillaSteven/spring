@@ -1323,9 +1323,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
 					//强行转化我们的后置处理器SmartInstantiationAwareBeanPostProcessor是他的BeanPostProcessors实现
 					SmartInstantiationAwareBeanPostProcessor ibp = (SmartInstantiationAwareBeanPostProcessor) bp;
-					//调用我们后置处理器的determineCandidateConstructors 来决定我们的构造方法
-					Constructor<?>[] ctors = ibp.determineCandidateConstructors(beanClass, beanName);
-					if (ctors != null) {
+						//调用我们后置处理器的determineCandidateConstructors 来决定我们的构造方法
+						Constructor<?>[] ctors = ibp.determineCandidateConstructors(beanClass, beanName);
+						if (ctors != null) {
 						return ctors;
 					}
 				}
@@ -1905,7 +1905,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
-			//调用我们的bean的后置处理器的postProcessorsBeforeInitialization方法
+			//调用我们的bean的后置处理器的postProcessorsBeforeInitialization方法  @PostCust注解的方法
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 

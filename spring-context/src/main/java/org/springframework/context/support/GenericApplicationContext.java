@@ -75,7 +75,6 @@ import org.springframework.util.Assert;
  * which are easier to set up - but less flexible, since you can just use standard
  * resource locations for XML bean definitions, rather than mixing arbitrary bean
  * definition formats. The equivalent in a web environment is
- * {@link org.springframework.web.context.support.XmlWebApplicationContext}.
  *
  * <p>For custom application context implementations that are supposed to read
  * special bean definition formats in a refreshable manner, consider deriving
@@ -265,7 +264,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws IllegalStateException {
-		//由于我们的bean工厂只会刷新ici，所有使用cas来保证线程安全
+		//由于我们的bean工厂只会刷新IOC的ID，所有使用cas来保证线程安全
 		if (!this.refreshed.compareAndSet(false, true)) {
 			throw new IllegalStateException(
 					"GenericApplicationContext does not support multiple refresh attempts: just call 'refresh' once");

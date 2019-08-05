@@ -139,10 +139,11 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	}
 
 	/**
-	 * Map config parameters onto bean properties of this servlet, and
-	 * invoke subclass initialization.
-	 * @throws ServletException if bean properties are invalid (or required
-	 * properties are missing), or if subclass initialization fails.
+	 * 方法实现说明:这个方法是servlet的init方法，这里是从写了父类的init方法
+	 * @author:smlz
+	 * @return:ServletException
+	 * @exception:
+	 * @date:2019/8/2 16:22
 	 */
 	@Override
 	public final void init() throws ServletException {
@@ -150,10 +151,14 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 			logger.debug("Initializing servlet '" + getServletName() + "'");
 		}
 
-		// Set bean properties from init parameters.
+		//从ServletConfig中解析处Serlvet配置中的init-param参数封装到PropertyValues中
 		PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
 		if (!pvs.isEmpty()) {
 			try {
+				/**
+				 * 将当前的这个 servlet 转化为一个 BeanWrapper ，从而能够以 Spring 的方式来对 init-pararn
+				 *的值进行注入
+				 */
 				BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
 				ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
 				bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
@@ -168,7 +173,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 			}
 		}
 
-		// Let subclasses do whatever initialization they like.
+		//调用子类来实例化我们的servletBean  FrameworkServlet
 		initServletBean();
 
 		if (logger.isDebugEnabled()) {
@@ -188,11 +193,11 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	}
 
 	/**
-	 * Subclasses may override this to perform custom initialization.
-	 * All bean properties of this servlet will have been set before this
-	 * method is invoked.
-	 * <p>This default implementation is empty.
-	 * @throws ServletException if subclass initialization fails
+	 * 方法实现说明:子类FrameworkServlet来重写了我们这个方法来实现逻辑
+	 * @author:smlz
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/2 20:45
 	 */
 	protected void initServletBean() throws ServletException {
 	}

@@ -46,8 +46,6 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * Any number of these characters are considered delimiters between
 	 * multiple context config paths in a single String value.
 	 * @see org.springframework.context.support.AbstractXmlApplicationContext#setConfigLocation
-	 * @see org.springframework.web.context.ContextLoader#CONFIG_LOCATION_PARAM
-	 * @see org.springframework.web.servlet.FrameworkServlet#setContextConfigLocation
 	 */
 	String CONFIG_LOCATION_DELIMITERS = ",; \t\n";
 
@@ -99,7 +97,6 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * a constructor if it isn't available when an object of this class is created,
 	 * for example in case of WebApplicationContext setup.
 	 * @param parent the parent context
-	 * @see org.springframework.web.context.ConfigurableWebApplicationContext
 	 */
 	void setParent(@Nullable ApplicationContext parent);
 

@@ -45,17 +45,21 @@ public abstract class AbstractAnnotationConfigDispatcherServletInitializer
 		extends AbstractDispatcherServletInitializer {
 
 	/**
-	 * {@inheritDoc}
-	 * <p>This implementation creates an {@link AnnotationConfigWebApplicationContext},
-	 * providing it the annotated classes returned by {@link #getRootConfigClasses()}.
-	 * Returns {@code null} if {@link #getRootConfigClasses()} returns {@code null}.
+	 * 方法实现说明:真正的创建我们的根容器
+	 * @author:smlz
+	 * @return:
+	 * @exception:
+	 * @date:2019/7/31 22:05
 	 */
 	@Override
 	@Nullable
 	protected WebApplicationContext createRootApplicationContext() {
+		//获取我们的IOC父容器的配置类
 		Class<?>[] configClasses = getRootConfigClasses();
 		if (!ObjectUtils.isEmpty(configClasses)) {
+			//创建我们的根容器
 			AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
+			//把配置类加载到根容器中
 			context.register(configClasses);
 			return context;
 		}
@@ -65,15 +69,22 @@ public abstract class AbstractAnnotationConfigDispatcherServletInitializer
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * <p>This implementation creates an {@link AnnotationConfigWebApplicationContext},
-	 * providing it the annotated classes returned by {@link #getServletConfigClasses()}.
+	 * 方法实现说明:真正的创建SpringMvc子容器对象
+	 * @author:smlz
+	 * @return:   WebApplicationContext
+	 * @exception:
+	 * @date:2019/7/31 21:51
 	 */
 	@Override
 	protected WebApplicationContext createServletApplicationContext() {
+		//创建我们的注解版本的配置的web应用上下文对象
 		AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
+		/**
+		 *获取我们的配置 子容器的配置类,但是getServletConfigClasses留给我们自己去实现
+		 */
 		Class<?>[] configClasses = getServletConfigClasses();
 		if (!ObjectUtils.isEmpty(configClasses)) {
+			//把配置类注册到我们的子容器中
 			context.register(configClasses);
 		}
 		return context;

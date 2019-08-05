@@ -116,20 +116,28 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 
 
 	/**
-	 * This implementation performs an actual refresh of this context's underlying
-	 * bean factory, shutting down the previous bean factory (if any) and
-	 * initializing a fresh bean factory for the next phase of the context's lifecycle.
+	 * 方法实现说明:是AbstractApplicationContext对象的子类,用于springmvc来刷新容器调用
+	 * @author:smlz
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/2 17:23
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
+		//若已经存在了 就信息销毁等操作
 		if (hasBeanFactory()) {
 			destroyBeans();
 			closeBeanFactory();
 		}
 		try {
+			/**
+			 * 为我们的Spring应用上下文对象创建我们的beanFactory
+			 */
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+			//为容器设置一个序列化ID
 			beanFactory.setSerializationId(getId());
 			customizeBeanFactory(beanFactory);
+			//加载我们的bean定义(最最最主要的作用就是保存我们的传递进去的配置类)
 			loadBeanDefinitions(beanFactory);
 			synchronized (this.beanFactoryMonitor) {
 				this.beanFactory = beanFactory;
@@ -190,18 +198,11 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
-	 * Create an internal bean factory for this context.
-	 * Called for each {@link #refresh()} attempt.
-	 * <p>The default implementation creates a
-	 * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
-	 * with the {@linkplain #getInternalParentBeanFactory() internal bean factory} of this
-	 * context's parent as parent bean factory. Can be overridden in subclasses,
-	 * for example to customize DefaultListableBeanFactory's settings.
-	 * @return the bean factory for this context
-	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
-	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowEagerClassLoading
-	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
-	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
+	 * 方法实现说明:为我们的spring 上下文创建我们的内置的beanFactory
+	 * @author:smlz
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/2 20:40
 	 */
 	protected DefaultListableBeanFactory createBeanFactory() {
 		return new DefaultListableBeanFactory(getInternalParentBeanFactory());

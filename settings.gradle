@@ -32,4 +32,5 @@ rootProject.children.each {project ->
 include 'spring-tl-beans'
 include 'spring-tuling-transactional'
 include 'spring-tuling-aop'
+include 'spring-tuling-webmvc'
 

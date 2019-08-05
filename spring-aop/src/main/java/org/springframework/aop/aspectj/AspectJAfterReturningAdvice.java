@@ -27,13 +27,13 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.TypeUtils;
 
 /**
- * Spring AOP advice wrapping an AspectJ after-returning advice method.
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:我们返回通知执行真正的实现类
  *
- * @author Rod Johnson
- * @author Juergen Hoeller
- * @author Ramnivas Laddad
- * @since 2.0
- */
+* @author: smlz
+* @createDate: 2019/7/30 16:13
+* @version: 1.0
+*/
 @SuppressWarnings("serial")
 public class AspectJAfterReturningAdvice extends AbstractAspectJAdvice
 		implements AfterReturningAdvice, AfterAdvice, Serializable {
@@ -60,6 +60,13 @@ public class AspectJAfterReturningAdvice extends AbstractAspectJAdvice
 		setReturningNameNoCheck(name);
 	}
 
+	/**
+	* @vlog: 高于生活，源于生活
+	* @desc: 类的描述:执行返回通知,当时他不直接执行，而是有他对应的拦截器对象执行
+	* @author: smlz
+	* @createDate: 2019/7/30 16:12
+	* @version: 1.0
+	*/
 	@Override
 	public void afterReturning(@Nullable Object returnValue, Method method, Object[] args, @Nullable Object target) throws Throwable {
 		if (shouldInvokeOnReturnValueOf(method, returnValue)) {
