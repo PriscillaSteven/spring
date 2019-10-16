@@ -123,16 +123,43 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 		this.embeddedValueResolver = resolver;
 	}
 
+	/**
+	 * 方法实现说明:在我们的RequestMappingHandlerMapping 这个Bean生命周期回调过程
+	 * 会调用初始化接口InitializingBean的afterPropertiesSet 来为我们的RequestMappingHandlerMapping
+	 * 进行初始化操作
+	 * @author:smlz
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/7 21:55
+	 */
 	@Override
 	public void afterPropertiesSet() {
+		//第一步:构建我们的RequestMappingInfo.BuilderConfiguration静态类部类对象
 		this.config = new RequestMappingInfo.BuilderConfiguration();
+		/**
+		 * 调用当前的父类AbstractHandlerMapping.getUrlPathHelper()获取UrlPathHelper对象
+		 */
 		this.config.setUrlPathHelper(getUrlPathHelper());
+		/**
+		 * 调用父类的AbstractHandlerMapping.getPathMatcher()的 ant匹配器对象
+		 */
 		this.config.setPathMatcher(getPathMatcher());
+
+		/**
+		 * 设置前缀匹配
+		 */
 		this.config.setSuffixPatternMatch(this.useSuffixPatternMatch);
+		/**
+		 * 末尾不带/ 的匹配
+		 */
 		this.config.setTrailingSlashMatch(this.useTrailingSlashMatch);
 		this.config.setRegisteredSuffixPatternMatch(this.useRegisteredSuffixPatternMatch);
+		//设置内容协商管理器(一个请求路径返回多种数据格式)
 		this.config.setContentNegotiationManager(getContentNegotiationManager());
-
+		/**
+		 * 调用父类的org.springframework.web.servlet.handler.AbstractHandlerMethodMapping#afterPropertiesSet()
+		 * 来处理器路径  和  控制器映射
+		 */
 		super.afterPropertiesSet();
 	}
 
@@ -179,20 +206,31 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	}
 
 	/**
-	 * Uses method and type-level @{@link RequestMapping} annotations to create
-	 * the RequestMappingInfo.
-	 * @return the created RequestMappingInfo, or {@code null} if the method
-	 * does not have a {@code @RequestMapping} annotation.
-	 * @see #getCustomMethodCondition(Method)
-	 * @see #getCustomTypeCondition(Class)
+	 * 方法实现说明:通过执行的方法对象,class对象获取对应的RequestMappingInfo 对象
+	 * @author:smlz
+	 * @param method:执行的目标对象
+	 * @param handlerType:方法所在的class对象
+	 * @return: RequestMappingInfo
+	 * @exception:
+	 * @date:2019/8/8 14:13
 	 */
 	@Override
 	@Nullable
 	protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
+		//解析method方法上的@ReuqestMapping注解，解析出对应的RequestMappingInfo对象
 		RequestMappingInfo info = createRequestMappingInfo(method);
+		//方法级别上的RequestMapping注解不为空
 		if (info != null) {
+			//创建类级别的RequestMappingInfo对象
 			RequestMappingInfo typeInfo = createRequestMappingInfo(handlerType);
+			//加入我们的Controller中也标注了@RequestMapping
 			if (typeInfo != null) {
+				/**
+				 * 把我们的类级别的RequestMappingInfo 和方法级别的RequestMappingInfo连接起来
+				 * 举例: 比如我们的UserContoller上标注了@RequestMapping(/user)
+				 * saveUser方法上标注了@RequestMapping("/save")
+				 * 那么combine结合之后的就是  /user/save
+				 */
 				info = typeInfo.combine(info);
 			}
 		}
@@ -200,17 +238,24 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	}
 
 	/**
-	 * Delegates to {@link #createRequestMappingInfo(RequestMapping, RequestCondition)},
-	 * supplying the appropriate custom {@link RequestCondition} depending on whether
-	 * the supplied {@code annotatedElement} is a class or method.
-	 * @see #getCustomTypeCondition(Class)
-	 * @see #getCustomMethodCondition(Method)
+	 * 方法实现说明:从我们的方法对象上的@RequestMapping注解中解析属性，创建我们的RequestMappingInfo对象
+	 * @author:smlz
+	 * @param element:我们的方法对象
+	 * @return: RequestMappingInfo
+	 * @exception:
+	 * @date:2019/8/8 14:17
 	 */
 	@Nullable
 	private RequestMappingInfo createRequestMappingInfo(AnnotatedElement element) {
+		//从我们的element对象上找出request注解
 		RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(element, RequestMapping.class);
+		//获取我们@RequestMapping注解上的各个条件
 		RequestCondition<?> condition = (element instanceof Class ?
 				getCustomTypeCondition((Class<?>) element) : getCustomMethodCondition((Method) element));
+		/**
+		 * 判断requestMapping注解是否为空
+		 * 不为空:真正的创建我们的createRequestMappingInfo(requestMapping,condition)
+		 */
 		return (requestMapping != null ? createRequestMappingInfo(requestMapping, condition) : null);
 	}
 
@@ -247,25 +292,35 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	}
 
 	/**
-	 * Create a {@link RequestMappingInfo} from the supplied
-	 * {@link RequestMapping @RequestMapping} annotation, which is either
-	 * a directly declared annotation, a meta-annotation, or the synthesized
-	 * result of merging annotation attributes within an annotation hierarchy.
+	 * 方法实现说明:采用【构建者模式】来构建我们的RequestMappingInfo对象
+	 * @author:smlz
+	 * @param requestMapping 注解对象
+	 * @param customCondition 自定义的条件
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/8 14:24
 	 */
 	protected RequestMappingInfo createRequestMappingInfo(
 			RequestMapping requestMapping, @Nullable RequestCondition<?> customCondition) {
 
 		RequestMappingInfo.Builder builder = RequestMappingInfo
+				//构建路径
 				.paths(resolveEmbeddedValuesInPatterns(requestMapping.path()))
+				//构建方法(get还是post等)
 				.methods(requestMapping.method())
+				//参数 对应http request parameter
 				.params(requestMapping.params())
+				//头部
 				.headers(requestMapping.headers())
+				//request的提交内容类型content type,如application/json, text/html
 				.consumes(requestMapping.consumes())
+				//指定返回的内容类型的content type，仅当request请求头中的(Accept)类型中包含该指定类型才返回
 				.produces(requestMapping.produces())
 				.mappingName(requestMapping.name());
 		if (customCondition != null) {
 			builder.customCondition(customCondition);
 		}
+		//真正的构建RequestMappingInfo对象
 		return builder.options(this.config).build();
 	}
 

@@ -21,21 +21,27 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * A factory for creating a {@link WebDataBinder} instance for a named target object.
- *
- * @author Arjen Poutsma
- * @since 3.1
- */
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:用于创建我们的WebDataBinder web数据绑定器 【工厂模式】
+ * 
+* @author: smlz
+* @createDate: 2019/8/12 20:03
+* @version: 1.0
+*/
 public interface WebDataBinderFactory {
 
 	/**
-	 * Create a {@link WebDataBinder} for the given object.
-	 * @param webRequest the current request
-	 * @param target the object to create a data binder for,
-	 * or {@code null} if creating a binder for a simple type
-	 * @param objectName the name of the target object
-	 * @return the created {@link WebDataBinder} instance, never null
-	 * @throws Exception raised if the creation and initialization of the data binder fails
+	 * 方法实现说明:工厂模式,创建我们的数据绑定器对象
+	 * WebDataBinderFactory
+	 *   InitBinderDataBinderFactory
+	 *   ServletRequestDataBinderFactory
+	 *   DefaultDataBinderFactory
+	 * @author:smlz
+	 * @param webRequest 请求对象
+	 * @param target HandlerMethod
+	 * @return: WebDataBinder
+	 * @exception:
+	 * @date:2019/8/12 20:03
 	 */
 	WebDataBinder createBinder(NativeWebRequest webRequest, @Nullable Object target, String objectName)
 			throws Exception;

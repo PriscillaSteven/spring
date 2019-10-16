@@ -154,20 +154,36 @@ public class UrlPathHelper {
 
 
 	/**
-	 * Return the mapping lookup path for the given request, within the current
-	 * servlet mapping if applicable, else within the web application.
-	 * <p>Detects include request URL if called within a RequestDispatcher include.
-	 * @param request current HTTP request
-	 * @return the lookup path
-	 * @see #getPathWithinServletMapping
-	 * @see #getPathWithinApplication
+	 * 方法实现说明:从request中获取出我们的controller的映射路径
+	 *请求 http://localhost:8080/tulingmvc/mvc/tuling
+	 * 知识普及: URL  URI  contextPath  servletPath
+	 * URL:http://localhost:8080/tulingmvc/mvc/tuling
+	 * URI:/tulingmvc/mvc/tuling
+	 * contextpath:/tulingmvc
+	 * servletPath:/mvc
+	 * @author:smlz
+	 * @param request 对象
+	 * @return: 映射路径
+	 * @exception:
+	 * @date:2019/8/9 17:01
 	 */
 	public String getLookupPathForRequest(HttpServletRequest request) {
-		// Always use full path within current servlet context?
+		/**
+		 * 我们知道SpringMvc的前端控制器对象DispatcherServlet,说白了就是一个Servlet
+		 * 我们需要配置他的拦截路径一般是/*.do   /* 等等等那么导致我们通过reuqest.getServletPath 为 "";
+		 * 假如我们的 请求转发路径为/mvc/*.do   那么request.getServletpath 就是/mvc
+		 * alwaysUseFullPath 是一个开关变量 默认为false
+		 * false:不允许全路径查找:   /tuling
+		 * true:表示允许全路径查找:  /mvc/tuling
+		 */
 		if (this.alwaysUseFullPath) {
 			return getPathWithinApplication(request);
 		}
-		// Else, use path within current servlet mapping if applicable
+
+		/**
+		 * 假如我们的请求为:http://localhost:8080/tulingmvc/mvc/tuling
+		 * 返回映射:/tuling
+		 */
 		String rest = getPathWithinServletMapping(request);
 		if (!"".equals(rest)) {
 			return rest;
@@ -178,22 +194,16 @@ public class UrlPathHelper {
 	}
 
 	/**
-	 * Return the path within the servlet mapping for the given request,
-	 * i.e. the part of the request's URL beyond the part that called the servlet,
-	 * or "" if the whole URL has been used to identify the servlet.
-	 * <p>Detects include request URL if called within a RequestDispatcher include.
-	 * <p>E.g.: servlet mapping = "/*"; request URI = "/test/a" -> "/test/a".
-	 * <p>E.g.: servlet mapping = "/"; request URI = "/test/a" -> "/test/a".
-	 * <p>E.g.: servlet mapping = "/test/*"; request URI = "/test/a" -> "/a".
-	 * <p>E.g.: servlet mapping = "/test"; request URI = "/test" -> "".
-	 * <p>E.g.: servlet mapping = "/*.test"; request URI = "/a.test" -> "".
-	 * @param request current HTTP request
-	 * @return the path within the servlet mapping, or ""
-	 * @see #getLookupPathForRequest
+	 * eg：我们的请求---->http://localhost:8080/tulingmvc/mvc/tuling
+	 * @param request
+	 * @return
 	 */
 	public String getPathWithinServletMapping(HttpServletRequest request) {
+		//获取到我们的 /mvc/tuling
 		String pathWithinApp = getPathWithinApplication(request);
+		//获取到我们的servletpath
 		String servletPath = getServletPath(request);
+		//把请求路径中的//替换为 /
 		String sanitizedPathWithinApp = getSanitizedPath(pathWithinApp);
 		String path;
 
@@ -202,6 +212,7 @@ public class UrlPathHelper {
 			path = getRemainingPath(sanitizedPathWithinApp, servletPath, false);
 		}
 		else {
+			//把/mvc从/mvc/tuling除去掉
 			path = getRemainingPath(pathWithinApp, servletPath, false);
 		}
 
@@ -233,15 +244,20 @@ public class UrlPathHelper {
 	}
 
 	/**
-	 * Return the path within the web application for the given request.
-	 * <p>Detects include request URL if called within a RequestDispatcher include.
-	 * @param request current HTTP request
-	 * @return the path within the web application
-	 * @see #getLookupPathForRequest
+	 * 方法实现说明:根据Request获取请求路径(包含servletPath)
+	 * eg:http://localhost:8080/tulingmvc/mvc/tuling
+	 * @author:smlz
+	 * @param request
+	 * @return: 路径
+	 * @exception:
+	 * @date:2019/8/11 13:54
 	 */
 	public String getPathWithinApplication(HttpServletRequest request) {
+		//获取contextPath ：/tulingmvc
 		String contextPath = getContextPath(request);
+		//获取requestUri:/tulingmvc/mvc/tuling
 		String requestUri = getRequestUri(request);
+		//从requestUri去除 contextPath /mvc/tuling
 		String path = getRemainingPath(requestUri, contextPath, true);
 		if (path != null) {
 			// Normal case: URI contains context path.

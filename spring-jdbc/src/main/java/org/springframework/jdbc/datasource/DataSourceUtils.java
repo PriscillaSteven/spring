@@ -60,21 +60,19 @@ public abstract class DataSourceUtils {
 
 
 	/**
-	 * Obtain a Connection from the given DataSource. Translates SQLExceptions into
-	 * the Spring hierarchy of unchecked generic data access exceptions, simplifying
-	 * calling code and making any exception that is thrown more meaningful.
-	 * <p>Is aware of a corresponding Connection bound to the current thread, for example
-	 * when using {@link DataSourceTransactionManager}. Will bind a Connection to the
-	 * thread if transaction synchronization is active, e.g. when running within a
-	 * {@link org.springframework.transaction.jta.JtaTransactionManager JTA} transaction).
-	 * @param dataSource the DataSource to obtain Connections from
-	 * @return a JDBC Connection from the given DataSource
-	 * @throws org.springframework.jdbc.CannotGetJdbcConnectionException
-	 * if the attempt to get a Connection failed
-	 * @see #releaseConnection
+	 * 方法实现说明:从数据源中获取一个数据库连接对象
+	 * @author:smlz
+	 * @param dataSource 数据库对象
+	 * @return:Connection返回一个数据库连接对象
+	 * @exception:
+	 * @date:2019/8/18 17:17
 	 */
 	public static Connection getConnection(DataSource dataSource) throws CannotGetJdbcConnectionException {
+
 		try {
+			/**
+			 * 真正的获取我们的数据库连接对象
+			 */
 			return doGetConnection(dataSource);
 		}
 		catch (SQLException ex) {
@@ -100,35 +98,54 @@ public abstract class DataSourceUtils {
 	public static Connection doGetConnection(DataSource dataSource) throws SQLException {
 		Assert.notNull(dataSource, "No DataSource specified");
 
+		/**
+		 * 第一步:尝试从我们的TransactionSynchronizationManager 事务同步管理器对象中获取数据库连接holder
+		 * 说白了就是去我们的线程局部变量中获取我们的数据库连接持有器对象
+		 * ThreadLocal<Map<Object, Object>> resources =new NamedThreadLocal<>
+		 * Map<DataSource,ConnectionHolder>
+		 * 若我们的service 中有事务的话,会在开启事务的时候会把数据库连接bind到我们的线程变量中
+		 */
 		ConnectionHolder conHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource);
 		if (conHolder != null && (conHolder.hasConnection() || conHolder.isSynchronizedWithTransaction())) {
+			//数据库连接对象引用+1
 			conHolder.requested();
 			if (!conHolder.hasConnection()) {
 				logger.debug("Fetching resumed JDBC Connection from DataSource");
 				conHolder.setConnection(fetchConnection(dataSource));
 			}
+			//返回我们的数据库连接
 			return conHolder.getConnection();
 		}
-		// Else we either got no holder or an empty thread-bound holder here.
 
 		logger.debug("Fetching JDBC Connection from DataSource");
+		/**
+		 * 这里是从数据库重新打开一个数据库连接对象
+		 * 结合上诉源码，说明jdbc有数据库连接的就使用同一个事务中的数据库连接,没有的话
+		 * 就新打开一个数据库连接，这样可以节省开销
+		 */
 		Connection con = fetchConnection(dataSource);
 
+		/**
+		 * 事务是否为同步激活
+		 */
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
 			try {
-				// Use same Connection for further JDBC actions within the transaction.
-				// Thread-bound object will get removed by synchronization at transaction completion.
+				//判断线程变量中TransactionSynchronizationManager保存了数据库连接
 				ConnectionHolder holderToUse = conHolder;
+				//封装数据库连接
 				if (holderToUse == null) {
 					holderToUse = new ConnectionHolder(con);
 				}
 				else {
 					holderToUse.setConnection(con);
 				}
+				//增加一个数据库连接引用
 				holderToUse.requested();
 				TransactionSynchronizationManager.registerSynchronization(
 						new ConnectionSynchronization(holderToUse, dataSource));
+				//设置同步状体
 				holderToUse.setSynchronizedWithTransaction(true);
+				//绑定数据源到线程变量中
 				if (holderToUse != conHolder) {
 					TransactionSynchronizationManager.bindResource(dataSource, holderToUse);
 				}

@@ -3,6 +3,7 @@ package tuling;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.springframework.core.annotation.Order;
 
 import java.util.Arrays;
 
@@ -10,6 +11,7 @@ import java.util.Arrays;
  * Created by smlz on 2019/6/10.
  */
 @Aspect
+@Order
 public class TulingLogAspect {
 
     @Pointcut("execution(* tuling.TulingCalculate.*(..))")

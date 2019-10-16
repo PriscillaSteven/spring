@@ -206,25 +206,32 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	}
 
 	/**
-	 * Checks if all conditions in this request mapping info match the provided request and returns
-	 * a potentially new request mapping info with conditions tailored to the current request.
-	 * <p>For example the returned instance may contain the subset of URL patterns that match to
-	 * the current request, sorted with best matching patterns on top.
-	 * @return a new instance in case all conditions match; or {@code null} otherwise
+	 * 方法实现说明:根据RequestappingInfo对象中的信息(用于描述@RequestMapping信息的)
+	 * @author:smlz
+	 * @param request
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/11 15:08
 	 */
 	@Override
 	@Nullable
 	public RequestMappingInfo getMatchingCondition(HttpServletRequest request) {
+		//获取RequestMethod方法   RequestMethod枚举类型(GET、POST、PUT、DELETE)
 		RequestMethodsRequestCondition methods = this.methodsCondition.getMatchingCondition(request);
+		//请求中的params 指定request中必须包含某些参数值是，才让该方法处理。
 		ParamsRequestCondition params = this.paramsCondition.getMatchingCondition(request);
+		//指定request中必须包含某些指定的header值，才能让该方法处理请求。
 		HeadersRequestCondition headers = this.headersCondition.getMatchingCondition(request);
+		//指定处理请求的提交内容类型（Content-Type），例如application/json, text/html;
 		ConsumesRequestCondition consumes = this.consumesCondition.getMatchingCondition(request);
+		//指定返回的内容类型，仅当request请求头中的(Accept)类型中包含该指定类型才返回；
 		ProducesRequestCondition produces = this.producesCondition.getMatchingCondition(request);
 
 		if (methods == null || params == null || headers == null || consumes == null || produces == null) {
 			return null;
 		}
-
+		//比如@RequestMapping(value = {"/tuling","/angle"}) 那么我们RequestMappingInfo对象
+		//中的patternsCondition 就会有二个,那么根据request解析出最合适的
 		PatternsRequestCondition patterns = this.patternsCondition.getMatchingCondition(request);
 		if (patterns == null) {
 			return null;
@@ -235,6 +242,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 			return null;
 		}
 
+		//封装为一个最合适的RequestMapingInfo信息返回去
 		return new RequestMappingInfo(this.name, patterns,
 				methods, params, headers, consumes, produces, custom.getCondition());
 	}

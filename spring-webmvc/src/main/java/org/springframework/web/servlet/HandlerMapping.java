@@ -21,38 +21,21 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface to be implemented by objects that define a mapping between
- * requests and handler objects.
- *
- * <p>This class can be implemented by application developers, although this is not
- * necessary, as {@link org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping}
- * and {@link org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping}
- * are included in the framework. The former is the default if no
- * HandlerMapping bean is registered in the application context.
- *
- * <p>HandlerMapping implementations can support mapped interceptors but do not
- * have to. A handler will always be wrapped in a {@link HandlerExecutionChain}
- * instance, optionally accompanied by some {@link HandlerInterceptor} instances.
- * The DispatcherServlet will first call each HandlerInterceptor's
- * {@code preHandle} method in the given order, finally invoking the handler
- * itself if all {@code preHandle} methods have returned {@code true}.
- *
- * <p>The ability to parameterize this mapping is a powerful and unusual
- * capability of this MVC framework. For example, it is possible to write
- * a custom mapping based on session state, cookie state or many other
- * variables. No other MVC framework seems to be equally flexible.
- *
- * <p>Note: Implementations can implement the {@link org.springframework.core.Ordered}
- * interface to be able to specify a sorting order and thus a priority for getting
- * applied by DispatcherServlet. Non-Ordered instances get treated as lowest priority.
- *
- * @author Rod Johnson
- * @author Juergen Hoeller
- * @see org.springframework.core.Ordered
- * @see org.springframework.web.servlet.handler.AbstractHandlerMapping
- * @see org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping
- * @see org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
- */
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:HandlerMapping接口描述:用到的设计模式:模板方法
+ *       HandlerMapping
+ *       ---AbstractHandlerMapping
+ *          ---AbstractHandlerMethodMapping(基于方法映射)
+ *             ---RequestMappingInfoHandlerMapping
+ *             	  ---RequestMappingHandlerMapping(处理@RequestMapping)
+ *          ---AbstractUrlHandlerMapping(基于URL映射)
+ *             ---AbstractDetectingUrlHandlerMapping
+ *             	  ---SimpleUrlHandlerMapping
+ *             ---BeanNameUrlHandlerMapping(根本bean的name来请求映射)
+* @author: smlz
+* @createDate: 2019/8/5 22:25
+* @version: 1.0
+*/
 public interface HandlerMapping {
 
 	/**
@@ -121,19 +104,12 @@ public interface HandlerMapping {
 	String PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE = HandlerMapping.class.getName() + ".producibleMediaTypes";
 
 	/**
-	 * Return a handler and any interceptors for this request. The choice may be made
-	 * on request URL, session state, or any factor the implementing class chooses.
-	 * <p>The returned HandlerExecutionChain contains a handler Object, rather than
-	 * even a tag interface, so that handlers are not constrained in any way.
-	 * For example, a HandlerAdapter could be written to allow another framework's
-	 * handler objects to be used.
-	 * <p>Returns {@code null} if no match was found. This is not an error.
-	 * The DispatcherServlet will query all registered HandlerMapping beans to find
-	 * a match, and only decide there is an error if none can find a handler.
-	 * @param request current HTTP request
-	 * @return a HandlerExecutionChain instance containing handler object and
-	 * any interceptors, or {@code null} if no mapping found
-	 * @throws Exception if there is an internal error
+	 * 方法实现说明:根据我们的request返回我们的拦截器数组对象和handler对象（控制器对象）
+	 * @author:smlz
+	 * @param request 对象
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/5 21:56
 	 */
 	@Nullable
 	HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception;

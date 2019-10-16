@@ -23,38 +23,39 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * Strategy interface for resolving method parameters into argument values in
- * the context of a given request.
- *
- * @author Arjen Poutsma
- * @since 3.1
- * @see HandlerMethodReturnValueHandler
- */
+* @vlog: 高于生活，源于生活  应用到的设计模式(模版方法)
+* @desc: 类的描述:参数解析器接口,用于解析方法的参数值
+ *       HandlerMethodArgumentResolver
+ *       	--AbstractNamedValueMethodArgumentResolver
+ *       	  --PathVariableMethodArgumentResolver (用于解析@PathVariable注解)
+ *       	  --RequestParamMethodArgumentResolver(用于解析@RequestParam注解的)
+ *          --AbstractMessageConverterMethodArgumentResolver
+ *            --RequestResponseBodyMethodProcessor(用于解析@RequestBody  @ResponseBody)
+* @author: smlz
+* @createDate: 2019/8/15 14:58
+* @version: 1.0
+*/
 public interface HandlerMethodArgumentResolver {
 
 	/**
-	 * Whether the given {@linkplain MethodParameter method parameter} is
-	 * supported by this resolver.
-	 * @param parameter the method parameter to check
-	 * @return {@code true} if this resolver supports the supplied parameter;
-	 * {@code false} otherwise
+	 * 方法实现说明:判断参数解析器是否支持解析该参数
+	 * @author:smlz
+	 * @param parameter
+	 * @return: true|false
+	 * @exception:
+	 * @date:2019/8/15 15:33
 	 */
 	boolean supportsParameter(MethodParameter parameter);
 
 	/**
-	 * Resolves a method parameter into an argument value from a given request.
-	 * A {@link ModelAndViewContainer} provides access to the model for the
-	 * request. A {@link WebDataBinderFactory} provides a way to create
-	 * a {@link WebDataBinder} instance when needed for data binding and
-	 * type conversion purposes.
-	 * @param parameter the method parameter to resolve. This parameter must
-	 * have previously been passed to {@link #supportsParameter} which must
-	 * have returned {@code true}.
-	 * @param mavContainer the ModelAndViewContainer for the current request
-	 * @param webRequest the current request
-	 * @param binderFactory a factory for creating {@link WebDataBinder} instances
-	 * @return the resolved argument value, or {@code null} if not resolvable
-	 * @throws Exception in case of errors with the preparation of argument values
+	 * 方法实现说明:真正的解析参数
+	 * @author:smlz
+	 * @param mavContainer 当前请求的上下文对象
+	 * @param webRequest 当前的请求
+	 * @param binderFactory 数据绑定器工厂，用于创建数据绑定器
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/15 15:48
 	 */
 	@Nullable
 	Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,

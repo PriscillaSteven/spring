@@ -233,14 +233,21 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 
 	/**
-	 * Initializes the interceptors.
-	 * @see #extendInterceptors(java.util.List)
-	 * @see #initInterceptors()
+	 * 初始化我们的所有的拦截器对象:怎么研究方法调用到initApplicationContext()
+	 * 根据调用链 发现在实例化RequestMappingHandlerMapping对象的时候
+	 * ApplicationContextAware
+	 *   ApplicationObjectSupport
+	 *      WebApplicationObjectSupport
+	 *      	AbstractHandlerMapping
+	 *      		RequestMappingHandlerMapping  通过ApplicatonContextAwareProcessor接口回调我们的XXAware接口
+	 *
+	 * @throws BeansException
 	 */
 	@Override
 	protected void initApplicationContext() throws BeansException {
 		extendInterceptors(this.interceptors);
 		detectMappedInterceptors(this.adaptedInterceptors);
+		//初始化我们的HandlerIntecepter 对象
 		initInterceptors();
 	}
 
@@ -338,29 +345,50 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 
 	/**
-	 * Look up a handler for the given request, falling back to the default
-	 * handler if no specific one is found.
-	 * @param request current HTTP request
-	 * @return the corresponding handler instance, or the default handler
-	 * @see #getHandlerInternal
+	 * 方法实现说明: 我们通过HandlerMapping去获取HandlerExecutionChain
+	 * 都会走这个方法，因为这个方法是我们所有的HandlerMapping的顶级抽象类
+	 * 该方法做了二个事情:
+	 * @author:smlz
+	 * @param request 请求对象
+	 * @return: HandlerExecutionChain
+	 * @exception:
+	 * @date:2019/8/9 14:30
 	 */
 	@Override
 	@Nullable
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+
+
+		/**
+		 * 1:找到我们的处理器对象
+		 * 1.1)怎么找? 我们再本子类的AbstractHandlerMapping的子类
+		 * RequestMappingHanlderMapping的生命回调接口InitializingBean中
+		 * 回去把我们的@RequestMapping注解信息和方法映射对象保存到我们的
+		 * 路径映射注册表中
+		 * AbstractHandlerMethodMapping#getHandlerInternal(javax.servlet.http.HttpServletRequest)
+		 */
 		Object handler = getHandlerInternal(request);
+
+		//判断上一步的handler是否为空
 		if (handler == null) {
+			//返回默认的handler
 			handler = getDefaultHandler();
 		}
+
 		if (handler == null) {
 			return null;
 		}
-		// Bean name or resolved handler?
+		//若我们的解析出来的handler是String 那么就要通过Web 容器创建我么你的handler对象
 		if (handler instanceof String) {
 			String handlerName = (String) handler;
 			handler = obtainApplicationContext().getBean(handlerName);
 		}
 
+		/**
+		 * 根据我们的处理器来构建我们的处理器执行链对象
+		 */
 		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
+		//处理跨越的  暂时不看
 		if (CorsUtils.isCorsRequest(request)) {
 			CorsConfiguration globalConfig = this.globalCorsConfigSource.getCorsConfiguration(request);
 			CorsConfiguration handlerConfig = getCorsConfiguration(handler, request);
@@ -371,52 +399,38 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	}
 
 	/**
-	 * Look up a handler for the given request, returning {@code null} if no
-	 * specific one is found. This method is called by {@link #getHandler};
-	 * a {@code null} return value will lead to the default handler, if one is set.
-	 * <p>On CORS pre-flight requests this method should return a match not for
-	 * the pre-flight request but for the expected actual request based on the URL
-	 * path, the HTTP methods from the "Access-Control-Request-Method" header, and
-	 * the headers from the "Access-Control-Request-Headers" header thus allowing
-	 * the CORS configuration to be obtained via {@link #getCorsConfigurations},
-	 * <p>Note: This method may also return a pre-built {@link HandlerExecutionChain},
-	 * combining a handler object with dynamically determined interceptors.
-	 * Statically specified interceptors will get merged into such an existing chain.
-	 * @param request current HTTP request
-	 * @return the corresponding handler instance, or {@code null} if none found
-	 * @throws Exception if there is an internal error
+	 * 方法实现说明:从request请求中获取我们的HandlerMethod对象
+	 * @author:smlz
+	 * @param request
+	 * @return: HandlerMethod对象
+	 * @exception:
+	 * @date:2019/8/11 15:36
 	 */
 	@Nullable
 	protected abstract Object getHandlerInternal(HttpServletRequest request) throws Exception;
 
 	/**
-	 * Build a {@link HandlerExecutionChain} for the given handler, including
-	 * applicable interceptors.
-	 * <p>The default implementation builds a standard {@link HandlerExecutionChain}
-	 * with the given handler, the handler mapping's common interceptors, and any
-	 * {@link MappedInterceptor}s matching to the current request URL. Interceptors
-	 * are added in the order they were registered. Subclasses may override this
-	 * in order to extend/rearrange the list of interceptors.
-	 * <p><b>NOTE:</b> The passed-in handler object may be a raw handler or a
-	 * pre-built {@link HandlerExecutionChain}. This method should handle those
-	 * two cases explicitly, either building a new {@link HandlerExecutionChain}
-	 * or extending the existing chain.
-	 * <p>For simply adding an interceptor in a custom subclass, consider calling
-	 * {@code super.getHandlerExecutionChain(handler, request)} and invoking
-	 * {@link HandlerExecutionChain#addInterceptor} on the returned chain object.
-	 * @param handler the resolved handler instance (never {@code null})
-	 * @param request current HTTP request
-	 * @return the HandlerExecutionChain (never {@code null})
-	 * @see #getAdaptedInterceptors()
+	 * 方法实现说明:通过我们的Hanlder对象封装成一个HandlerExecutionChain 处理器执行链
+	 * @author:smlz
+	 * @param handler 处理器对象
+	 * @param request 请求
+	 * @return:HandlerExecutionChain
+	 * @date:2019/8/11 15:35
 	 */
 	protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpServletRequest request) {
+
+		//创建我们处理器执行链对象
 		HandlerExecutionChain chain = (handler instanceof HandlerExecutionChain ?
 				(HandlerExecutionChain) handler : new HandlerExecutionChain(handler));
-
+		//从我们的请求中获取我们的请求映射路径
 		String lookupPath = this.urlPathHelper.getLookupPathForRequest(request);
+
+		//循环获取我们的所有的拦截器对象
 		for (HandlerInterceptor interceptor : this.adaptedInterceptors) {
+			//判断拦截器对象是不是实现  HandlerInterceptor
 			if (interceptor instanceof MappedInterceptor) {
 				MappedInterceptor mappedInterceptor = (MappedInterceptor) interceptor;
+				//通过路径匹配 看该拦截器是否会拦截本次请求路径
 				if (mappedInterceptor.matches(lookupPath, this.pathMatcher)) {
 					chain.addInterceptor(mappedInterceptor.getInterceptor());
 				}
@@ -425,6 +439,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 				chain.addInterceptor(interceptor);
 			}
 		}
+		//返回我们的拦截器链执行器对象
 		return chain;
 	}
 

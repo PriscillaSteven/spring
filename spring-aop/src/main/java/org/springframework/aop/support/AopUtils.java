@@ -116,18 +116,15 @@ public abstract class AopUtils {
 	}
 
 	/**
-	 * Select an invocable method on the target type: either the given method itself
-	 * if actually exposed on the target type, or otherwise a corresponding method
-	 * on one of the target type's interfaces or on the target type itself.
-	 * @param method the method to check
-	 * @param targetType the target type to search methods on (typically an AOP proxy)
-	 * @return a corresponding invocable method on the target type
-	 * @throws IllegalStateException if the given method is not invocable on the given
-	 * target type (typically due to a proxy mismatch)
-	 * @since 4.3
-	 * @see MethodIntrospector#selectInvocableMethod(Method, Class)
+	 * 方法实现说明:判断传入的方法是不是一个 可调用的方法
+	 * @author:smlz
+	 * @param method 方法对象
+	 * @return: targetType class对象
+	 * @exception:
+	 * @date:2019/8/8 14:57
 	 */
 	public static Method selectInvocableMethod(Method method, @Nullable Class<?> targetType) {
+		//若传入的class对象为空，直接返回null
 		if (targetType == null) {
 			return method;
 		}

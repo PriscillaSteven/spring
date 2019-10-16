@@ -3,6 +3,9 @@ package com.tuling.compent;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,19 +16,18 @@ import org.springframework.stereotype.Component;
 public class TulingDao {
 
 	@Autowired
-	@Qualifier(value = "tulingDataSource")
-	private TulingDataSource tulingDataSource2;
+	private TulingDataSource tulingDataSource;
 
 	public TulingDataSource getTulingDataSource() {
-		return tulingDataSource2;
+		return tulingDataSource;
 	}
 
-	public void setTulingDataSource2(TulingDataSource tulingDataSource) {
-		this.tulingDataSource2 = tulingDataSource;
+	public void setTulingDataSource(TulingDataSource tulingDataSource) {
+		this.tulingDataSource = tulingDataSource;
 	}
 
 	public TulingDao(TulingDataSource tulingDataSource) {
-		this.tulingDataSource2 = tulingDataSource;
+		this.tulingDataSource = tulingDataSource;
 		System.out.println("我是TulingDao的构造方法");
 	}
 

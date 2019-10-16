@@ -241,20 +241,33 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 
 
 	/**
-	 * Perform a scan within the specified base packages.
-	 * @param basePackages the packages to check for annotated classes
-	 * @return number of beans registered
+	 * 方法实现说明:真正的扫描我们@MapperScan的backpackage指定的路径的
+	 * Mapper包
+	 * @author:smlz
+	 * @param basePackages 包的路径
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/21 17:15
 	 */
 	public int scan(String... basePackages) {
+		/**
+		 * 还没有扫描mapper包之前 容器中所有的bean定义个数
+		 */
 		int beanCountAtScanStart = this.registry.getBeanDefinitionCount();
 
+		/**
+		 * 真正的扫描我们的mapper包的mapper类
+		 */
 		doScan(basePackages);
 
-		// Register annotation config processors, if necessary.
+		// 注册系统中的配置类处理器
 		if (this.includeAnnotationConfig) {
 			AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 		}
 
+		/**
+		 * 返回扫描出mapper的bean定义的个数
+		 */
 		return (this.registry.getBeanDefinitionCount() - beanCountAtScanStart);
 	}
 

@@ -151,7 +151,13 @@ public class RequestParamMethodArgumentResolver extends AbstractNamedValueMethod
 
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
+		//从参数对象parameter中判断是否有@RequestParam注解
 		RequestParam ann = parameter.getParameterAnnotation(RequestParam.class);
+		/**
+		 * 注解不为空表示有该注解
+		 * 那么就和创建 RequestParamNamedValueInfo的有参数构造器
+		 * 没有该注解  调用RequestParamNamedValueInfo的无参数构造器
+		 */
 		return (ann != null ? new RequestParamNamedValueInfo(ann) : new RequestParamNamedValueInfo());
 	}
 

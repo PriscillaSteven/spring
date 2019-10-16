@@ -30,7 +30,6 @@ import org.springframework.beans.factory.InitializingBean;
  *
  * @author Juergen Hoeller
  * @since 1.2.2
- * @see org.springframework.jdbc.core.support.JdbcDaoSupport
  */
 public abstract class DaoSupport implements InitializingBean {
 
@@ -38,9 +37,23 @@ public abstract class DaoSupport implements InitializingBean {
 	protected final Log logger = LogFactory.getLog(getClass());
 
 
+	/**
+	 * 方法实现说明:我们的UserMapper<MapperFactoryBean>的生命周期回调的时候会回调
+	 * InitializingBean.afterPropertiesSet()来检查我们的配置
+	 * InitializingBean
+	 *   --DaoSupport
+	 *   	--SqlSessionDaoSupport
+	 *   	  --MapperFactoryBean
+	 * @author:smlz
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/22 19:30
+	 */
 	@Override
 	public final void afterPropertiesSet() throws IllegalArgumentException, BeanInitializationException {
-		// Let abstract subclasses check their configuration.
+		/**
+		 * 检查我们Dao的配置,mybaits的配置就会调用子类SqlSessionDaoSupport的checkDaoConfig();
+		 */
 		checkDaoConfig();
 
 		// Let concrete implementations initialize themselves.

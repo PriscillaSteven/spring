@@ -60,12 +60,16 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 
 
 	/**
-	 * This implementation expects the handler to be an {@link HandlerMethod}.
-	 * @param handler the handler instance to check
-	 * @return whether or not this adapter can adapt the given handler
+	 * 方法实现说明:我们的handlerAdapter是否支持当前的handler
+	 * @author:smlz
+	 * @param handler
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/11 16:20
 	 */
 	@Override
 	public final boolean supports(Object handler) {
+		//判断hanlder 是不是HandlerMethod实现类或者子类   && 默认返回true
 		return (handler instanceof HandlerMethod && supportsInternal((HandlerMethod) handler));
 	}
 
@@ -77,13 +81,23 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	protected abstract boolean supportsInternal(HandlerMethod handlerMethod);
 
 	/**
-	 * This implementation expects the handler to be an {@link HandlerMethod}.
+	 * 方法实现说明:父类中获取我们的ModleAndView对象
+	 * @author:smlz
+	 * @param request
+	 * @param response
+	 * @param handler
+	 * @return:ModelAndView
+	 * @exception:
+	 * @date:2019/8/11 17:16
 	 */
 	@Override
 	@Nullable
 	public final ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 
+		/**
+		 * 调用到具体子类的方法
+		 */
 		return handleInternal(request, response, (HandlerMethod) handler);
 	}
 

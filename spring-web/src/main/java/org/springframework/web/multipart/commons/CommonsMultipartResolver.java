@@ -118,9 +118,19 @@ public class CommonsMultipartResolver extends CommonsFileUploadSupport
 		}
 	}
 
-
+	/**
+	 * 方法实现说明:判断我们的请求是不是文件上传
+	 * @author:smlz
+	 * @param request
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/7 20:48
+	 */
 	@Override
 	public boolean isMultipart(HttpServletRequest request) {
+		/**
+		 * 判断逻辑:要求是POST请求 && 请求头中包含了 multipart/
+		 */
 		return ServletFileUpload.isMultipartContent(request);
 	}
 

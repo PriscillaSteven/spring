@@ -32,27 +32,32 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.HandlerMethod;
 
+
+
 /**
- * Provides a method for invoking the handler method for a given request after resolving its
- * method argument values through registered {@link HandlerMethodArgumentResolver}s.
- *
- * <p>Argument resolution often requires a {@link WebDataBinder} for data binding or for type
- * conversion. Use the {@link #setDataBinderFactory(WebDataBinderFactory)} property to supply
- * a binder factory to pass to argument resolvers.
- *
- * <p>Use {@link #setHandlerMethodArgumentResolvers} to customize the list of argument resolvers.
- *
- * @author Rossen Stoyanchev
- * @author Juergen Hoeller
- * @since 3.1
- */
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:该类的主要功能就是在调用目标方法之前，我们通过构造器注入的的HandlerMethodArgumentResolver
+ * 参数解析器来解析我们的目标方法参数,parameterNameDiscoverer 参数探测器探测我们的目标方法参数
+* @author: smlz
+* @createDate: 2019/8/12 19:35
+* @version: 1.0
+*/
 public class InvocableHandlerMethod extends HandlerMethod {
 
+	/**
+	 * 数据绑定器对象
+	 */
 	@Nullable
 	private WebDataBinderFactory dataBinderFactory;
 
+	/**
+	 * 参数解析器对象
+	 */
 	private HandlerMethodArgumentResolverComposite argumentResolvers = new HandlerMethodArgumentResolverComposite();
 
+	/**
+	 * 参数名称探测器
+	 */
 	private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
 
@@ -110,29 +115,30 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	}
 
 
+
 	/**
-	 * Invoke the method after resolving its argument values in the context of the given request.
-	 * <p>Argument values are commonly resolved through {@link HandlerMethodArgumentResolver}s.
-	 * The {@code providedArgs} parameter however may supply argument values to be used directly,
-	 * i.e. without argument resolution. Examples of provided argument values include a
-	 * {@link WebDataBinder}, a {@link SessionStatus}, or a thrown exception instance.
-	 * Provided argument values are checked before argument resolvers.
-	 * @param request the current request
-	 * @param mavContainer the ModelAndViewContainer for this request
-	 * @param providedArgs "given" arguments matched by type, not resolved
-	 * @return the raw value returned by the invoked method
-	 * @throws Exception raised if no suitable argument resolver can be found,
-	 * or if the method raised an exception
+	 * 方法实现说明:调用我们的目标对象,再调用目标对象之前我们需要解析参数
+	 * @author:smlz
+	 * @param request
+	 * @param mavContainer 视图容器
+	 * @param providedArgs 提供的参数
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/12 19:38
 	 */
 	@Nullable
 	public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+		/**
+		 * 获取我们目标方法入参的值
+		 */
 		Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Invoking '" + ClassUtils.getQualifiedMethodName(getMethod(), getBeanType()) +
 					"' with arguments " + Arrays.toString(args));
 		}
+		//真的的调用我们的目标方法
 		Object returnValue = doInvoke(args);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Method [" + ClassUtils.getQualifiedMethodName(getMethod(), getBeanType()) +
@@ -142,22 +148,39 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	}
 
 	/**
-	 * Get the method argument values for the current request.
+	 * 方法实现说明:获取我们的标注了@ModelAttribute注解方法的参数值
+	 * @author:smlz
+	 * @param request 请求对象
+	 * @param mavContainer 模型视图容器
+	 * @return: Object[] 目标方法参数值
+	 * @exception:
+	 * @date:2019/8/12 22:26
 	 */
 	private Object[] getMethodArgumentValues(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+		/**
+		 * 获取目标方法参数的描述数组对象
+		 */
 		MethodParameter[] parameters = getMethodParameters();
+
+		//用来初始化我们对应参数名称的参数值得数组
 		Object[] args = new Object[parameters.length];
+		//循环我们得参数名数组
 		for (int i = 0; i < parameters.length; i++) {
 			MethodParameter parameter = parameters[i];
+
+			//为我们得MethodParameter设置参数名称探测器对象
 			parameter.initParameterNameDiscovery(this.parameterNameDiscoverer);
+			//providedArgs ?未知 不知道从哪里提供出来的
 			args[i] = resolveProvidedArgument(parameter, providedArgs);
 			if (args[i] != null) {
 				continue;
 			}
+			//获取所有的参数解析器，然后筛选出合适的解析器
 			if (this.argumentResolvers.supportsParameter(parameter)) {
 				try {
+					//通过参数解析器来解析我们的参数
 					args[i] = this.argumentResolvers.resolveArgument(
 							parameter, mavContainer, request, this.dataBinderFactory);
 					continue;

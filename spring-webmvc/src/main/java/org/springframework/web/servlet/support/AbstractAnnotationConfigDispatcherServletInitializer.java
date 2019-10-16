@@ -16,6 +16,7 @@
 
 package org.springframework.web.servlet.support;
 
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.WebApplicationContext;

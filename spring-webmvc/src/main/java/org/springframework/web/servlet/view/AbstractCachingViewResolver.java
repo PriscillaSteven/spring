@@ -30,18 +30,21 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 
 /**
- * Convenient base class for {@link org.springframework.web.servlet.ViewResolver}
- * implementations. Caches {@link org.springframework.web.servlet.View} objects
- * once resolved: This means that view resolution won't be a performance problem,
- * no matter how costly initial view retrieval is.
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:
+ *  AbstractCachingViewResolver是一个抽象类，这种视图解析器会把它曾经解析过的视图保存起来，
+ *  然后每次要解析视图的时候先从缓存里面找，如果找到了对应的视图就直接返回，如果没有就创建一个新的视图对象，
+ *  然后把它放到一个用于缓存的map中，接着再把新建的视图返回。使用这种视图缓存的方式可以把解析视图的性能问题降到最低.
  *
- * <p>Subclasses need to implement the {@link #loadView} template method,
- * building the View object for a specific view name and locale.
- *
- * @author Rod Johnson
- * @author Juergen Hoeller
- * @see #loadView
- */
+ *  2. AbstractCachingViewResolver是带有缓存功能的ViewResolver接口基础实现抽象类，
+ *     该类有个属性名为viewAccessCache的以 "viewName_locale" 为key， View接口为value的Map。
+ *     该抽象类实现的resolveViewName方法内部会调用createView方法，方法内部会调用loadView抽象方法
+ *	ViewResolver
+ *		--AbstractCachingViewResolver
+* @author: smlz
+* @createDate: 2019/8/16 13:36
+* @version: 1.0
+*/
 public abstract class AbstractCachingViewResolver extends WebApplicationObjectSupport implements ViewResolver {
 
 	/** Default maximum number of entries for the view cache: 1024 */
@@ -60,21 +63,29 @@ public abstract class AbstractCachingViewResolver extends WebApplicationObjectSu
 	};
 
 
-	/** The maximum number of entries in the cache */
+	/**
+	 * 缓存的最大页面数量1024个
+	 */
 	private volatile int cacheLimit = DEFAULT_CACHE_LIMIT;
 
 	/** Whether we should refrain from resolving views again if unresolved once */
 	private boolean cacheUnresolved = true;
 
-	/** Fast access cache for Views, returning already cached instances without a global lock */
+	/**
+	 * 用于缓存页面的  key:viewName_local,value：View
+	 */
 	private final Map<Object, View> viewAccessCache = new ConcurrentHashMap<>(DEFAULT_CACHE_LIMIT);
 
-	/** Map from view key to View instance, synchronized for View creation */
-	@SuppressWarnings("serial")
+	/**
+	 * 用户缓存页面的支持,过期策略
+	 */
 	private final Map<Object, View> viewCreationCache =
 			new LinkedHashMap<Object, View>(DEFAULT_CACHE_LIMIT, 0.75f, true) {
 				@Override
 				protected boolean removeEldestEntry(Map.Entry<Object, View> eldest) {
+					/**
+					 * 当且仅当我们的map的容量大于 默认容量1024 就会移除最老的kv
+					 */
 					if (size() > getCacheLimit()) {
 						viewAccessCache.remove(eldest.getKey());
 						return true;
@@ -146,17 +157,28 @@ public abstract class AbstractCachingViewResolver extends WebApplicationObjectSu
 	@Override
 	@Nullable
 	public View resolveViewName(String viewName, Locale locale) throws Exception {
+		/**
+		 * 是否启用缓存，可通过setCache()方法或setCacheLimit()方法开启缓存，
+		 * 是一个ConcurrentHashMap，默认缓存大小1024,可以在配置我们的视图解析器的时候
+		 * 配置是否启用缓存 默认情况下为了提升性能 是开启的
+		 */
 		if (!isCache()) {
 			return createView(viewName, locale);
 		}
 		else {
+
+			//获取缓存的key:viewName + '_' + locale;
 			Object cacheKey = getCacheKey(viewName, locale);
+			//尝试去缓存中加载
 			View view = this.viewAccessCache.get(cacheKey);
+			/**
+			 * dcl,防止并发解析
+			 */
 			if (view == null) {
 				synchronized (this.viewCreationCache) {
 					view = this.viewCreationCache.get(cacheKey);
 					if (view == null) {
-						// Ask the subclass to create the View object.
+						//调用子类去创建我们的视图对象
 						view = createView(viewName, locale);
 						if (view == null && this.cacheUnresolved) {
 							view = UNRESOLVED_VIEW;
@@ -232,20 +254,17 @@ public abstract class AbstractCachingViewResolver extends WebApplicationObjectSu
 
 
 	/**
-	 * Create the actual View object.
-	 * <p>The default implementation delegates to {@link #loadView}.
-	 * This can be overridden to resolve certain view names in a special fashion,
-	 * before delegating to the actual {@code loadView} implementation
-	 * provided by the subclass.
-	 * @param viewName the name of the view to retrieve
-	 * @param locale the Locale to retrieve the view for
-	 * @return the View instance, or {@code null} if not found
-	 * (optional, to allow for ViewResolver chaining)
-	 * @throws Exception if the view couldn't be resolved
-	 * @see #loadView
+	 * 方法实现说明:创建视图:该方法已经被改写,调用具体子类来实现创建视图 UrlBasedViewResolver
+	 * @author:smlz
+	 * @param viewName 视图名称
+	 * @param locale 语言代码
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/16 14:07
 	 */
 	@Nullable
 	protected View createView(String viewName, Locale locale) throws Exception {
+		//加载一个视图s
 		return loadView(viewName, locale);
 	}
 

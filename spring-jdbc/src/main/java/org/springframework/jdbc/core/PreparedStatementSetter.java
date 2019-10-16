@@ -20,7 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * General callback interface used by the {@link JdbcTemplate} class.
+ * JdbcTemplate类使用的常规回调接口
  *
  * <p>This interface sets values on a {@link java.sql.PreparedStatement} provided
  * by the JdbcTemplate class, for each of a number of updates in a batch using the
@@ -44,10 +44,12 @@ import java.sql.SQLException;
 public interface PreparedStatementSetter {
 
 	/**
-	 * Set parameter values on the given PreparedStatement.
-	 * @param ps the PreparedStatement to invoke setter methods on
-	 * @throws SQLException if a SQLException is encountered
-	 * (i.e. there is no need to catch SQLException)
+	 * 方法实现说明:给我们的PreparedStatement绑定参数的
+	 * @author:smlz
+	 * @param ps:预编译结果对象
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/18 17:01
 	 */
 	void setValues(PreparedStatement ps) throws SQLException;
 

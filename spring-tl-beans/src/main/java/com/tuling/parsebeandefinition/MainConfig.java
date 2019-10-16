@@ -1,9 +1,6 @@
 package com.tuling.parsebeandefinition;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
 
 /**
  * Created by smlz on 2019/7/15.
@@ -16,5 +13,10 @@ public class MainConfig {
 	@Bean
 	public CompentD compentD() {
 		return new CompentD();
+	}
+
+	@Bean
+	public CompentC compentC() {
+		return new CompentC();
 	}
 }

@@ -216,7 +216,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		  /**
 		 * 这里使用 while 循环进行处理，原因是：可能会存在多重别名的问题，即别名指向别名。比如下面
 		 * 的配置：
-		 *   <bean id="tulingDao" class="com.tuling.dao.tulingDao"/>
+		 *   <bean id="tulingDao" class="com.tuling.mapper.tulingDao"/>
 		 *   <alias name="tulingDao" alias="aliasA"/>
 		 *   <alias name="aliasA" alias="aliasB"/>
 		 *

@@ -21,7 +21,7 @@ public class PayServiceImpl implements PayService {
     @Autowired
     private ProductInfoDao productInfoDao;
 
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
     public void pay(String accountId, double money) {
         //查询余额
         double blance = accountInfoDao.qryBlanceByUserId(accountId);
@@ -33,7 +33,7 @@ public class PayServiceImpl implements PayService {
 
 		//this.updateProductStore(1);
 
-        System.out.println(1/1);
+        System.out.println(1/0);
 
         //更新余额
         int retVal = accountInfoDao.updateAccountBlance(accountId,money);

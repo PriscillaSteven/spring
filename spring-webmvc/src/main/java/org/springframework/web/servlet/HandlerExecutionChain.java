@@ -29,25 +29,28 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Handler execution chain, consisting of handler object and any handler interceptors.
- * Returned by HandlerMapping's {@link HandlerMapping#getHandler} method.
- *
- * @author Juergen Hoeller
- * @since 20.06.2003
- * @see HandlerInterceptor
- */
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:处理器执行链对象
+* @author: smlz
+* @createDate: 2019/8/7 20:41
+* @version: 1.0
+*/
 public class HandlerExecutionChain {
 
 	private static final Log logger = LogFactory.getLog(HandlerExecutionChain.class);
 
+	//目标对象
 	private final Object handler;
 
+	//拦截器链数组
 	@Nullable
 	private HandlerInterceptor[] interceptors;
 
+	//拦截器对象集合
 	@Nullable
 	private List<HandlerInterceptor> interceptorList;
 
+	//拦截器执行下标
 	private int interceptorIndex = -1;
 
 
@@ -123,17 +126,32 @@ public class HandlerExecutionChain {
 
 
 	/**
-	 * Apply preHandle methods of registered interceptors.
-	 * @return {@code true} if the execution chain should proceed with the
-	 * next interceptor or the handler itself. Else, DispatcherServlet assumes
-	 * that this interceptor has already dealt with the response itself.
+	 * 方法实现说明:我们系统拦截器的后置方法
+	 * @author:smlz
+	 * @param request
+	 * @param response
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/11 16:26
 	 */
 	boolean applyPreHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//获取我们容器中的所有拦截器对象
 		HandlerInterceptor[] interceptors = getInterceptors();
 		if (!ObjectUtils.isEmpty(interceptors)) {
+			//循环我们容器中的拦截器对象
 			for (int i = 0; i < interceptors.length; i++) {
 				HandlerInterceptor interceptor = interceptors[i];
+				/**
+				 * 一但有一个拦截器的pre方法返回false的话，那么就不会继续执行下去
+				 * 比如我们有三个拦截器对象
+				 * 第一个.pre 方法   第二个.pre方法返回的是false的时候,那么第二个就不会被执行了
+				 * 就会触发拦截器的AfterCompletion方法
+				 * 那么执行AfterCompletion的时候
+				 * 就会执行第二个.AfterCompletion  然后再执行第一个.AfterCompletion
+				 *
+				 */
 				if (!interceptor.preHandle(request, response, this.handler)) {
+					//触发拦截器的AfterCompletion
 					triggerAfterCompletion(request, response, null);
 					return false;
 				}

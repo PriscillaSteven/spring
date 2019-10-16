@@ -20,37 +20,36 @@ import java.util.Locale;
 
 import org.springframework.lang.Nullable;
 
+
 /**
- * Interface to be implemented by objects that can resolve views by name.
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:用于解析我们的视图对象的
  *
- * <p>View state doesn't change during the running of the application,
- * so implementations are free to cache views.
- *
- * <p>Implementations are encouraged to support internationalization,
- * i.e. localized view resolution.
- *
- * @author Rod Johnson
- * @author Juergen Hoeller
- * @see org.springframework.web.servlet.view.InternalResourceViewResolver
- * @see org.springframework.web.servlet.view.ResourceBundleViewResolver
- * @see org.springframework.web.servlet.view.XmlViewResolver
- */
+* @author: smlz
+* @createDate: 2019/8/15 17:19
+* @version: 1.0
+*    ViewResolver
+ *     --AbstractCachingViewResolver
+ *       --UrlBasedViewResolver
+ *       	--InternalResourceViewResolver(解析jsp)
+ *          --AbstractTemplateViewResolver
+ *            --FreeMarkerViewResolver(解析freemarker)
+ *       --XmlViewResolver(解析xml)
+ *       --ResourceBundleViewResolver
+ *     --BeanNameViewResolver(解析基于beanNmae)
+ *     --ViewResolverComposite(综合解析)
+*/
 public interface ViewResolver {
 
+
 	/**
-	 * Resolve the given view by name.
-	 * <p>Note: To allow for ViewResolver chaining, a ViewResolver should
-	 * return {@code null} if a view with the given name is not defined in it.
-	 * However, this is not required: Some ViewResolvers will always attempt
-	 * to build View objects with the given name, unable to return {@code null}
-	 * (rather throwing an exception when View creation failed).
-	 * @param viewName name of the view to resolve
-	 * @param locale Locale in which to resolve the view.
-	 * ViewResolvers that support internationalization should respect this.
-	 * @return the View object, or {@code null} if not found
-	 * (optional, to allow for ViewResolver chaining)
-	 * @throws Exception if the view cannot be resolved
-	 * (typically in case of problems creating an actual View object)
+	 * 方法实现说明:解析视图对象
+	 * @author:smlz
+	 * @param viewName 视图名称
+	 * @param locale 国家语言代码
+	 * @return: View 视图对象
+	 * @exception:
+	 * @date:2019/8/15 17:21
 	 */
 	@Nullable
 	View resolveViewName(String viewName, Locale locale) throws Exception;

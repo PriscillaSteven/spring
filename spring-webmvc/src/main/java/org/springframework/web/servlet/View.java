@@ -23,26 +23,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.lang.Nullable;
 
 /**
- * MVC View for a web interaction. Implementations are responsible for rendering
- * content, and exposing the model. A single view exposes multiple model attributes.
- *
- * <p>This class and the MVC approach associated with it is discussed in Chapter 12 of
- * <a href="https://www.amazon.com/exec/obidos/tg/detail/-/0764543857/">Expert One-On-One J2EE Design and Development</a>
- * by Rod Johnson (Wrox, 2002).
- *
- * <p>View implementations may differ widely. An obvious implementation would be
- * JSP-based. Other implementations might be XSLT-based, or use an HTML generation library.
- * This interface is designed to avoid restricting the range of possible implementations.
- *
- * <p>Views should be beans. They are likely to be instantiated as beans by a ViewResolver.
- * As this interface is stateless, view implementations should be thread-safe.
- *
- * @author Rod Johnson
- * @author Arjen Poutsma
- * @author Rossen Stoyanchev
- * @see org.springframework.web.servlet.view.AbstractView
- * @see org.springframework.web.servlet.view.InternalResourceView
- */
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:视图接口
+* @author: smlz
+* @createDate: 2019/8/15 17:03
+* @version: 1.0
+*/
 public interface View {
 
 	/**
@@ -82,16 +68,19 @@ public interface View {
 		return null;
 	}
 
+
 	/**
-	 * Render the view given the specified model.
-	 * <p>The first step will be preparing the request: In the JSP case, this would mean
-	 * setting model objects as request attributes. The second step will be the actual
-	 * rendering of the view, for example including the JSP via a RequestDispatcher.
-	 * @param model Map with name Strings as keys and corresponding model
-	 * objects as values (Map can also be {@code null} in case of empty model)
-	 * @param request current HTTP request
-	 * @param response HTTP response we are building
-	 * @throws Exception if rendering failed
+	 * 方法实现说明:渲染我们的视图
+	 * 拿我们的JSP为例子
+	 *   第一步:我们需要把我们的模型数据设置到Request对象中
+	 *   第二步:真正的渲染视图,通过request进行转发
+	 * @author:smlz
+	 * @param model 模型数据
+	 * @param request
+	 * @param response
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/15 17:10
 	 */
 	void render(@Nullable Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
 			throws Exception;

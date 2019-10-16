@@ -109,18 +109,31 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	}
 
 	/**
-	 * Iterate over registered {@link HandlerMethodArgumentResolver}s and invoke the one that supports it.
-	 * @throws IllegalStateException if no suitable {@link HandlerMethodArgumentResolver} is found.
+	 * 方法实现说明：通过参数解析器来解析我们参数值
+	 * @author:smlz
+	 * @param parameter 参数对象
+	 * @param mavContainer 视图上下文对象
+	 * @param webRequest 请求对象
+	 * @param binderFactory 数据绑定器
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/14 15:57
 	 */
 	@Override
 	@Nullable
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
+		/**
+		 * 通过参数筛选出我们的参数解析器对象
+		 */
 		HandlerMethodArgumentResolver resolver = getArgumentResolver(parameter);
 		if (resolver == null) {
 			throw new IllegalArgumentException("Unknown parameter type [" + parameter.getParameterType().getName() + "]");
 		}
+		/**
+		 * 挑选我们的参数解析器来解析我们真正的参数值
+		 */
 		return resolver.resolveArgument(parameter, mavContainer, webRequest, binderFactory);
 	}
 

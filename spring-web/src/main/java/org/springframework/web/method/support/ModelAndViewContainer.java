@@ -29,36 +29,42 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.bind.support.SimpleSessionStatus;
 
 /**
- * Records model and view related decisions made by
- * {@link HandlerMethodArgumentResolver}s and
- * {@link HandlerMethodReturnValueHandler}s during the course of invocation of
- * a controller method.
- *
- * <p>The {@link #setRequestHandled} flag can be used to indicate the request
- * has been handled directly and view resolution is not required.
- *
- * <p>A default {@link Model} is automatically created at instantiation.
- * An alternate model instance may be provided via {@link #setRedirectModel}
- * for use in a redirect scenario. When {@link #setRedirectModelScenario} is set
- * to {@code true} signalling a redirect scenario, the {@link #getModel()}
- * returns the redirect model instead of the default model.
- *
- * @author Rossen Stoyanchev
- * @author Juergen Hoeller
- * @since 3.1
- */
+* @vlog: 高于生活，源于生活
+* @desc: 类的描述:模型视图上下文对象
+* @author: smlz
+* @createDate: 2019/8/14 13:15
+* @version: 1.0
+*/
 public class ModelAndViewContainer {
 
+	/**
+	 * redirect时,是否忽略defaultModel
+	 */
 	private boolean ignoreDefaultModelOnRedirect = false;
 
+	/**
+	 * 视图,实际使用时可能是String类型的逻辑视图
+	 */
 	@Nullable
 	private Object view;
 
+	/**
+	 * 默认模型,我们可以简单科普下ModelMap继承体系
+	 * 处理器中使用了Model或ModelMap时，ArgumentResolve会传入defaultModel。
+	 * defaultModel的话，因为它是BindingAwareModel Map类型，而且继承了ModelMap又实现了Model接口，
+	 * 所以在处理器中使用Model或ModelMap时，其实都是使用同一个对象。-----------Map参数传入的也是这个对象
+	 */
 	private final ModelMap defaultModel = new BindingAwareModelMap();
 
+	/**
+	 * redirect时使用的模型,实际使用的是RedirectAttributesModelMap
+	 */
 	@Nullable
 	private ModelMap redirectModel;
 
+	/**
+	 * 标记处理器返回redirect视图
+	 */
 	private boolean redirectModelScenario = false;
 
 	@Nullable
@@ -68,8 +74,14 @@ public class ModelAndViewContainer {
 
 	private final Set<String> bindingDisabled = new HashSet<>(4);
 
+	/**
+	 * @SessionAttributes注解使用状态标记,就是是否处理完毕
+	 */
 	private final SessionStatus sessionStatus = new SimpleSessionStatus();
 
+	/**
+	 * 标记handler是否已经完成请求处理
+	 */
 	private boolean requestHandled = false;
 
 

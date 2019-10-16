@@ -2,11 +2,23 @@ package com.tuling.starter;
 
 import com.tuling.config.RootConfig;
 import com.tuling.config.WebAppConfig;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 /**
+ * 在tomcat源码中:
+ *  org.apache.catalina.startup.ContextConfig#lifecycleEvent(org.apache.catalina.LifecycleEvent
+ *  	org.apache.catalina.startup.ContextConfig#configureStart
+ *          org.apache.catalina.startup.ContextConfig#webConfig
+ *             org.apache.catalina.startup.ContextConfig#processServletContainerInitializers
+ *
+ *	 //通过spi的机制加载 classpath下ServletContainerInitializer
+ *	 WebappServiceLoader<ServletContainerInitializer> loader = new WebappServiceLoader<>(context);
+     detectedScis = loader.load(ServletContainerInitializer.class);
+ *
  * Created by smlz on 2019/7/31.
  */
+
 public class TulingStarterInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
 	/**
@@ -38,6 +50,6 @@ public class TulingStarterInitializer extends AbstractAnnotationConfigDispatcher
 	 */
 	@Override
 	protected String[] getServletMappings() {
-		return new String[]{"/*"};
+		return new String[]{"/"};
 	}
 }

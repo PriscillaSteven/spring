@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 /**
  * Created by smlz on 2019/5/29.
  */
-public class InstanceA {
+public class InstanceA implements IApi {
 
     private InstanceB instanceB;
 
@@ -31,4 +31,8 @@ public class InstanceA {
         System.out.println("InstanceA实例化");
     }
 
+	@Override
+	public void say() {
+		System.out.println("hhhhhhhhhhh");
+	}
 }

@@ -455,22 +455,24 @@ public class UrlBasedViewResolver extends AbstractCachingViewResolver implements
 	}
 
 	/**
-	 * Overridden to implement check for "redirect:" prefix.
-	 * <p>Not possible in {@code loadView}, since overridden
-	 * {@code loadView} versions in subclasses might rely on the
-	 * superclass always creating instances of the required view class.
-	 * @see #loadView
-	 * @see #requiredViewClass
+	 * 方法实现说明:创建视图对象
+	 * @author:smlz
+	 * @param viewName 视图名称
+	 * @param locale :语言
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/16 14:10
 	 */
 	@Override
 	protected View createView(String viewName, Locale locale) throws Exception {
-		// If this resolver is not supposed to handle the given view,
-		// return null to pass on to the next resolver in the chain.
+		//若当前的视图解析器不能过解析视图,返回空
 		if (!canHandle(viewName, locale)) {
 			return null;
 		}
 
-		// Check for special "redirect:" prefix.
+		/**
+		 * 判断是不是重定向的
+		 */
 		if (viewName.startsWith(REDIRECT_URL_PREFIX)) {
 			String redirectUrl = viewName.substring(REDIRECT_URL_PREFIX.length());
 			RedirectView view = new RedirectView(redirectUrl,
@@ -482,13 +484,17 @@ public class UrlBasedViewResolver extends AbstractCachingViewResolver implements
 			return applyLifecycleMethods(REDIRECT_URL_PREFIX, view);
 		}
 
-		// Check for special "forward:" prefix.
+		/**
+		 * 判断是不是转发
+		 */
 		if (viewName.startsWith(FORWARD_URL_PREFIX)) {
 			String forwardUrl = viewName.substring(FORWARD_URL_PREFIX.length());
 			return new InternalResourceView(forwardUrl);
 		}
 
-		// Else fall back to superclass implementation: calling loadView.
+		/**
+		 * 既不是转发,又不是重定向,那么就调用父类AbstractCachingViewResolver来创建视图
+		 */
 		return super.createView(viewName, locale);
 	}
 

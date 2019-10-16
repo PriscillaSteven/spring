@@ -41,42 +41,64 @@ import org.springframework.util.ReflectionUtils;
 public abstract class MethodIntrospector {
 
 	/**
-	 * Select methods on the given target type based on the lookup of associated metadata.
-	 * <p>Callers define methods of interest through the {@link MetadataLookup} parameter,
-	 * allowing to collect the associated metadata into the result map.
-	 * @param targetType the target type to search methods on
-	 * @param metadataLookup a {@link MetadataLookup} callback to inspect methods of interest,
-	 * returning non-null metadata to be associated with a given method if there is a match,
-	 * or {@code null} for no match
-	 * @return the selected methods associated with their metadata (in the order of retrieval),
-	 * or an empty map in case of no match
+	 * 方法实现说明:传入class对象，以及metadataLookup接口来获取我们标注了@RequestMapping的方法集合，存放在
+	 * Map中
+	 * @author:smlz
+	 * @param targetType :我们的具体controller对象的class
+	 * @param metadataLookup:lambda注册的表达式接口
+	 * @return: 方法对象和路径的映射map
+	 * @exception:
+	 * @date:2019/8/8 13:34
 	 */
 	public static <T> Map<Method, T> selectMethods(Class<?> targetType, final MetadataLookup<T> metadataLookup) {
 		final Map<Method, T> methodMap = new LinkedHashMap<>();
 		Set<Class<?>> handlerTypes = new LinkedHashSet<>();
 		Class<?> specificHandlerType = null;
 
+		//获取原始的class对象
 		if (!Proxy.isProxyClass(targetType)) {
 			specificHandlerType = ClassUtils.getUserClass(targetType);
 			handlerTypes.add(specificHandlerType);
 		}
+
+		//获取class的接口
 		handlerTypes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetType));
 
+		//循环我们的class集合
 		for (Class<?> currentHandlerType : handlerTypes) {
 			final Class<?> targetClass = (specificHandlerType != null ? specificHandlerType : currentHandlerType);
-
+			/**
+			 * 又式一个拉姆达表达式:逻辑注入到doWithMethods MethodCallback接口中的
+			 * doWith方法中
+			 */
 			ReflectionUtils.doWithMethods(currentHandlerType, method -> {
+				/**
+				 * 从doWithMethods方法中的mc.doWith(method)调入进来.
+				 */
+				//获取具体的方法对象
 				Method specificMethod = ClassUtils.getMostSpecificMethod(method, targetClass);
+				/**
+				 * 调用lamada表达式对象的getMappingForMethod方法
+				 * RequestMappingHandlerMapping#getMappingForMethod(java.lang.reflect.Method, java.lang.Class)
+				 */
 				T result = metadataLookup.inspect(specificMethod);
+
 				if (result != null) {
+					/**
+					 * 一个类继承了一个范型类或者实现了一个范型接口, 那么编译器在编译这个类的时候就会生成一个叫做桥接方法的混合方法
+					 * (混合方法简单的说就是由编译器生成的方法, 方法上有synthetic修饰符), 这个方法用于范型的类型安全处理,
+					 * 用户一般不需要关心桥接方法
+					 * https://docs.oracle.com/javase/tutorial/java/generics/bridgeMethods.html
+					 */
 					Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
 					if (bridgedMethod == specificMethod || metadataLookup.inspect(bridgedMethod) == null) {
+						//把方法对象作为key,RequestMappingInfo对象作为value保存到map中
 						methodMap.put(specificMethod, result);
 					}
 				}
 			}, ReflectionUtils.USER_DECLARED_METHODS);
 		}
-
+		//返回我们的map对象
 		return methodMap;
 	}
 

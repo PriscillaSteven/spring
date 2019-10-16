@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 /**
  * Created by smlz on 2019/7/31.
  */
-@Service
+@Service("tulingServiceImpl")
 public class TulingServiceImpl  {
 
 	public void sayHello() {

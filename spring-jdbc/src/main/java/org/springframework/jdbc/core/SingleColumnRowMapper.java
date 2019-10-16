@@ -76,6 +76,9 @@ public class SingleColumnRowMapper<T> implements RowMapper<T> {
 	 * returned by the JDBC driver.
 	 */
 	public void setRequiredType(Class<T> requiredType) {
+		/**
+		 * 判断是不是基础的类型
+		 */
 		this.requiredType = ClassUtils.resolvePrimitiveIfNecessary(requiredType);
 	}
 

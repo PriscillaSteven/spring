@@ -1539,7 +1539,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		for (String propertyName : propertyNames) {
 			//判断该属性名称是不是引用对象
 			if (containsBean(propertyName)) {
-				//显示的调用getBean所有属性的名称bean显示调用
+				//显示的调用getBean所有属性的名称bean显示调用BeanFactory
 				Object bean = getBean(propertyName);
 				//把我们依赖的属性添加到pvs中
 				pvs.add(propertyName, bean);

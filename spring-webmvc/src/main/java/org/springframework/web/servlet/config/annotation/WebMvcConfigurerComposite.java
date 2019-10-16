@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.MessageCodesResolver;
@@ -136,6 +137,7 @@ class WebMvcConfigurerComposite implements WebMvcConfigurer {
 		for (WebMvcConfigurer delegate : this.delegates) {
 			delegate.configureMessageConverters(converters);
 		}
+
 	}
 
 	@Override

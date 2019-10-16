@@ -108,6 +108,10 @@ public final class ModelFactory {
 
 		Map<String, ?> sessionAttributes = this.sessionAttributesHandler.retrieveAttributes(request);
 		container.mergeAttributes(sessionAttributes);
+
+		/**
+		 * 真正的调用我们的@ModelAttribute注解的方法
+		 */
 		invokeModelAttributeMethods(request, container);
 
 		for (String name : findSessionAttributeArguments(handlerMethod)) {
@@ -128,10 +132,17 @@ public final class ModelFactory {
 	private void invokeModelAttributeMethods(NativeWebRequest request, ModelAndViewContainer container)
 			throws Exception {
 
+		/**
+		 * 因为我们在创建ModelFactory过程中已经把标注了@ModelAtturite方法赋值好了，
+		 * 所以modelMethods不会为空
+		 */
 		while (!this.modelMethods.isEmpty()) {
+			//获取我们的@ModelAttribute标注的方法
 			InvocableHandlerMethod modelMethod = getNextModelMethod(container).getHandlerMethod();
+			//获取我们的ModelAttribute注解的属性
 			ModelAttribute ann = modelMethod.getMethodAnnotation(ModelAttribute.class);
 			Assert.state(ann != null, "No ModelAttribute annotation");
+			//我们的MV容器是否包含我们的属性名称
 			if (container.containsAttribute(ann.name())) {
 				if (!ann.binding()) {
 					container.setBindingDisabled(ann.name());
@@ -139,6 +150,10 @@ public final class ModelFactory {
 				continue;
 			}
 
+			/**
+			 * 真正的调用我们的@ModelAttribute注解的方法
+			 * invokeForRequest
+			 */
 			Object returnValue = modelMethod.invokeForRequest(request, container);
 			if (!modelMethod.isVoid()){
 				String returnValueName = getNameForReturnValue(returnValue, modelMethod.getReturnType());
@@ -189,20 +204,27 @@ public final class ModelFactory {
 	}
 
 	/**
-	 * Promote model attributes listed as {@code @SessionAttributes} to the session.
-	 * Add {@link BindingResult} attributes where necessary.
-	 * @param request the current request
-	 * @param container contains the model to update
-	 * @throws Exception if creating BindingResult attributes fails
+	 * 方法实现说明:更新模型数据,就是把我们目标方法中的数据存放到
+	 * 标注了@SesionAttributes注解的name的值存放到session中
+	 * @author:smlz
+	 * @param request 请求对象
+	 * @param container 上下文视图
+	 * @return:
+	 * @exception:
+	 * @date:2019/8/15 16:51
 	 */
 	public void updateModel(NativeWebRequest request, ModelAndViewContainer container) throws Exception {
+		//获取所有的模型数据
 		ModelMap defaultModel = container.getDefaultModel();
+		//表示session已经处理完了没有
 		if (container.getSessionStatus().isComplete()){
 			this.sessionAttributesHandler.cleanupAttributes(request);
 		}
 		else {
+			//把模型数据存储到session中
 			this.sessionAttributesHandler.storeAttributes(request, defaultModel);
 		}
+		//把模型数据更新到request对象中
 		if (!container.isRequestHandled() && container.getModel() == defaultModel) {
 			updateBindingResult(request, defaultModel);
 		}
